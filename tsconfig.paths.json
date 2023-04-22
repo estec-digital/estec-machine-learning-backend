@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~core/*": ["src/core/*"],
+      "~db/*": ["src/db/*"],
+      "~functions/*": ["src/functions/*"],
+      "~services/*": ["src/services/*"],
+      "~types/*": ["src/types/*"],
+      "~tests/*": ["src/tests/*"],
+      "~shared/*": ["src/shared/*"],
+      "~root/*": ["src/*"]
+    }
+  }
+}

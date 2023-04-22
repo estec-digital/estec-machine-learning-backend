@@ -1,0 +1,20 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# esbuild directories
+.esbuild
+
+.env
+.env.alpha
+.env.beta
+.env.edu
+.env.prod
+.env.test
+
+src/tests_result
+
+.esbuild
