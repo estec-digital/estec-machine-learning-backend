@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
 import { User } from '~db/entities/User'
 import * as Types from '../types'
+
 export class AuthService {
   public static async register(params: Types.IRegister): Promise<Types.IRegisterResponse> {
     const existingUser = await User.findOneBy({ username: params.username })

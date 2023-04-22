@@ -1,0 +1,44 @@
+Label,Status,Desccription
+1,"BZT thap, OXY thap, BET thap","Tang gio lo, tang mot it nhien lieu"
+2,"BZT thap, OXY thap, BET thap","Tang gio lo, tang mot it nhien lieu, giam toc do lo, giam mot it lieu"
+3,"BZT thap, OXY thap, BET on","Tang nhe gio lo, giam mot it nhien lieu, giam toc do lo, giam mot chut lieu"
+4,"BZT thap, OXY thap, BET cao","Giam mot chut nhien lieu, giam gio lo, giam toc do lo, giam mot it lieu"
+5,"BZT thap, OXY on, BET thap","Tang gio lo, tang nhien lieu"
+6,"BZT thap, OXY on, BET thap","Tang nhe gio lo, tang nhien lieu, giam toc do lo, giam mot it lieu"
+7,"BZT thap, OXY on, BET on",Tang nhien lieu
+8,"BZT thap, OXY on, BET on","Tang nhe gio lo, tang mot it nhien lieu, giam toc do lo, giam mot it lieu"
+9,"BZT thap, OXY on, BET cao",Giam gio lo
+10,"BZT thap, OXY on, BET cao","Giam mot it nhien lieu, giam gio lo, giam toc do lo, giam mot it lieu"
+11,"BZT thap, OXY cao, BET thap",Tang nhien lieu
+12,"BZT thap, OXY cao, BET thap","Tang nhien lieu, giam toc do lo, giam mot it lieu"
+13,"BZT thap, OXY cao, BET on",Tang nhien lieu
+14,"BZT thap, OXY cao, BET on","Tang nhien lieu, giam toc do lo, giam mot it lieu"
+15,"BZT thap, OXY cao, BET cao","Tang nhien lieu, giam gio lo"
+16,"BZT thap, OXY cao, BET cao","Tang nhien lieu, giam gio lo, giam toc do lo, giam mot it lieu"
+17,"BZT on, OXY thap, BET thap","Tang gio lo, tang mot it nhien lieu"
+18,"BZT on, OXY thap, BET on","Tang gio lo, tang mot it nhien lieu"
+19,"BZT on, OXY thap, BET cao","Giam nhien lieu, giam mot it gio lo"
+20,"BZT on, OXY on, BET thap","Tang gio lo, tang mot it nhien lieu"
+21,"BZT on, OXY on, BET on","Tang gio lo, tang nhien lieu, tang lieu, tang toc do lo"
+22,"BZT on, OXY on, BET cao",Giam gio lo
+23,"BZT on, OXY on, BET cao","Giam mot it nhien lieu, giam gio lo"
+24,"BZT on, OXY cao, BET thap","Tang mot it gio lo, tang nhien lieu"
+25,"BZT on, OXY cao, BET on","Giam gio lo, giam mot it nhiet lieu"
+26,"BZT on, OXY cao, BET cao","Giam gio lo, giam mot it nhiet lieu"
+27,"BZT cao, OXY thap, BET thap",Tang gio lo
+28,"BZT cao, OXY thap, BET thap","Tang gio lo, tang toc do lo, tang lieu"
+29,"BZT cao, OXY thap, BET on",Tang gio lo
+30,"BZT cao, OXY thap, BET cao",Tang gio lo
+31,"BZT cao, OXY thap, BET cao","Tang gio lo, tang toc do lo, tang lieu"
+32,"BZT cao, OXY on, BET thap",Tang gio lo
+33,"BZT cao, OXY on, BET thap","Tang gio lo, tang toc do lo, tang lieu"
+34,"BZT cao, OXY on, BET on",Giam nhien lieu
+35,"BZT cao, OXY on, BET on","Giam nhien lieu, tang mot it toc do lo, tang mot chut lieu"
+36,"BZT cao, OXY on, BET cao",Giam nhien lieu
+37,"BZT cao, OXY on, BET cao","Giam nhien lieu, tang toc do lo, tang lieu"
+38,"BZT cao, OXY cao, BET thap",Giam nhien lieu
+39,"BZT cao, OXY cao, BET thap","Tang gio lo, tang toc do lo, tang lieu"
+40,"BZT cao, OXY cao, BET on",Giam nhien lieu
+41,"BZT cao, OXY cao, BET on","Tang gio lo, tang toc do lo, tang lieu"
+42,"BZT cao, OXY cao, BET cao","Giam nhien lieu, giam mot it gio lo"
+43,"BZT cao, OXY cao, BET cao","Giam nhien lieu, giam mot it gio lo, tang toc do lo, tang lieu"

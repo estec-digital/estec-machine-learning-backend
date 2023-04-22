@@ -7,9 +7,8 @@ export default {
     {
       http: {
         method: 'POST',
-        path: 'data',
+        path: 'auth',
         cors: true,
-        authorizer: 'AuthTokenValidation',
         request: {
           schemas: {
             'application/json': schema,

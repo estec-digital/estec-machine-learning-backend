@@ -3,6 +3,10 @@ import type { AWS, AwsLogRetentionInDays } from '@serverless/typescript'
 // Admin
 import AdminFunction from '~functions/Admin/routes'
 
+// Auth
+import AuthFunction from '~functions/Auth/routes'
+import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
+
 // Data
 import DataFunction from '~functions/Data/routes'
 
@@ -54,6 +58,8 @@ const serverlessConfiguration: AWS = {
   // AWS Lambda functions declaration
   functions: {
     AdminFunction,
+    AuthFunction,
+    AuthTokenValidation,
     DataFunction,
   },
   package: { individually: true },

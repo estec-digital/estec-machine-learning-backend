@@ -1,3 +1,3 @@
-type TAuthAction = 'register' | 'login'
+type TDataAction = 'get-data'
 
-export type TAllowAction = TAuthAction
+export type TAllowAction = TDataAction

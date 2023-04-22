@@ -1,6 +1,5 @@
 import { IActionHandlerParams, RestHandler } from '~core/rest-handler/RestHandler'
-import { AdminService } from '~services/Admin'
-import * as AdminServiceTypes from '~services/Admin/types'
+import { AdminService, Types as AdminServiceTypes } from '~services/Admin'
 import * as Types from './types'
 
 class FunctionHandler extends RestHandler<Types.TAllowAction>() {

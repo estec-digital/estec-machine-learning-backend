@@ -10,20 +10,20 @@ export class Data extends KBaseEntity {
   @Column({ type: 'timestamp', unique: true })
   datetime: Date
 
-  @Column({ type: 'double' })
+  @Column({ type: 'double', nullable: true })
   pyrometer: number
 
-  @Column({ type: 'double' })
+  @Column({ type: 'double', nullable: true })
   nOx_GA01: number
 
-  @Column({ type: 'double' })
+  @Column({ type: 'double', nullable: true })
   oxi_GA01: number
 
-  @Column({ type: 'double' })
+  @Column({ type: 'double', nullable: true })
   kiln_inlet_temp: number
 
   // Foreign keys
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   labelId: number
 
   // Expand field
