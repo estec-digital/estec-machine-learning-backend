@@ -58,3 +58,7 @@ export function customWhereFullName(queryBuilder: SelectQueryBuilder<any>, entit
     queryBuilder.andWhere(query)
   }
 }
+
+export function generateResourceName(name: string) {
+  return '${self:service}-${self:provider.stage}-' + name
+}

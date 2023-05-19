@@ -9,7 +9,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   }
 
   private static async initDataToDB(params: IActionHandlerParams<AdminServiceTypes.IInitDataToDB>) {
-    return await AdminService.initDataToDB(params.bodyPayload)
+    return await AdminService.initDataToDBNoSQL(params.bodyPayload)
   }
 }
 

@@ -10,3 +10,8 @@ export interface IGetDataResponse {
   toDate: Date
   data: Data[]
 }
+
+export interface ISensorDataQuery {
+  partition: string
+  range: object
+}

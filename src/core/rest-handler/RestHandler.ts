@@ -94,7 +94,7 @@ export function RestHandler<TAllowAction>() {
 
     public static getHandlerFunction() {
       const handlerFunction = async (event, context) => {
-        await AppDataSource.initializeConnection()
+        // await AppDataSource.initializeConnection()
 
         this.restHandler = new RestHandlerWithActionAndPayload<TAllowAction>(lodash.cloneDeep(event), lodash.cloneDeep(context))
 

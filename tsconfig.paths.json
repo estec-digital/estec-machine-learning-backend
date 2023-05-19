@@ -2,8 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "~aws_resources/*": ["src/aws_resources/*"],
       "~core/*": ["src/core/*"],
       "~db/*": ["src/db/*"],
+      "~db_nosql/*": ["src/db_nosql/*"],
       "~functions/*": ["src/functions/*"],
       "~services/*": ["src/services/*"],
       "~types/*": ["src/types/*"],

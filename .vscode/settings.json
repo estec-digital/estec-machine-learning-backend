@@ -1,6 +1,6 @@
 {
   "cSpell.ignoreWords": ["esbuild", "middyfy", "unmarshall"],
-  "cSpell.words": ["estec"],
+  "cSpell.words": ["estec", "nosql"],
   "javascript.implicitProjectConfig.experimentalDecorators": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
