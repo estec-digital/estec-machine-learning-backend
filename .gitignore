@@ -9,11 +9,8 @@ jspm_packages
 .esbuild
 
 .env
-.env.alpha
-.env.beta
-.env.edu
-.env.prod
-.env.test
+.env.*
+!.env.example
 
 src/tests_result
 

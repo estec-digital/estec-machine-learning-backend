@@ -56,7 +56,7 @@ export class AppDataSource {
           username: process.env.MYSQL_DB_USERNAME,
           password: process.env.MYSQL_DB_PASSWORD,
           // IMPORTANT: false on production
-          synchronize: true,
+          // synchronize: true,
           entities: entities,
         })
       }

@@ -1,8 +1,4 @@
-<h1 align='center'>Serverless API</h1>
-
-## **Explanation and examples 📚**
-
-[https://docs.google.com/document/d/1NSc4-eij6NaD4SgGQdHEi-wkPiO992at97-PzkDMqxs](https://docs.google.com/document/d/1NSc4-eij6NaD4SgGQdHEi-wkPiO992at97-PzkDMqxs)
+<h1 align='center'>ESTEC Machine Learning Backend</h1>
 
 <br/><br/>
 

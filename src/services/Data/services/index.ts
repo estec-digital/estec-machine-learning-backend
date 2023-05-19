@@ -9,6 +9,9 @@ export class DataService {
       where: {
         datetime: Raw((columnAlias) => `${columnAlias} >= '${dayjs(params.fromDate).format()}' AND ${columnAlias} <= '${dayjs(params.toDate).format()}'`),
       },
+      relations: {
+        Label: true,
+      },
     })
     return {
       fromDate: params.fromDate,

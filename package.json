@@ -16,7 +16,8 @@
   "dependencies": {
     "@middy/core": "^2.5.3",
     "@middy/http-json-body-parser": "^2.5.3",
-    "csv-parser": "^3.0.0"
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.171.0",

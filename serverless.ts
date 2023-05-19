@@ -1,4 +1,5 @@
 import type { AWS, AwsLogRetentionInDays } from '@serverless/typescript'
+import * as dotenv from 'dotenv'
 
 // Admin
 import AdminFunction from '~functions/Admin/routes'
@@ -10,6 +11,8 @@ import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
 // Data
 import DataFunction from '~functions/Data/routes'
 
+dotenv.config()
+
 const serverlessConfiguration: AWS = {
   service: 'estec-backend',
   frameworkVersion: '3',
@@ -17,7 +20,7 @@ const serverlessConfiguration: AWS = {
   provider: {
     // Cloud provider's name and region
     name: 'aws',
-    region: 'eu-north-1',
+    region: 'ap-southeast-1',
 
     // CloudFormation stage
     stage: '${opt:stage, "alpha"}',
@@ -26,6 +29,11 @@ const serverlessConfiguration: AWS = {
     runtime: 'nodejs16.x',
     timeout: 10,
     memorySize: 1024,
+
+    vpc: {
+      securityGroupIds: JSON.parse(process.env.SECURITY_GROUP_IDS ?? '[]'),
+      subnetIds: JSON.parse(process.env.SUBNET_IDS ?? '[]'),
+    },
 
     // AWS API Gateway configs
     apiGateway: {

@@ -3,11 +3,23 @@ import dayjs from 'dayjs'
 import fs from 'fs'
 import { DeepPartial } from 'typeorm'
 import { Data } from '~db/entities/Data'
+import { Label } from '~db/entities/Label'
 import * as Types from '../types'
 
 export class AdminService {
   private static async readCSVFile<RowType>(params: Types.IReadCSVFile<RowType>) {
-    return fs.createReadStream(params.file).pipe(csv()).on('data', params.onData).on('end', params.onEnd)
+    return new Promise((resolve, reject) => {
+      fs.createReadStream(params.file)
+        .pipe(csv())
+        .on('data', params.onData)
+        .on('end', async () => {
+          if (typeof params.onEnd === 'function') {
+            await params.onEnd()
+          }
+          resolve(true)
+        })
+        .on('error', (err) => reject(err))
+    })
   }
 
   public static async initDataToDB(params: Types.IInitDataToDB): Promise<Types.IInitDataToDBResponse> {
@@ -21,11 +33,9 @@ export class AdminService {
     //       description: data.Desccription,
     //     })
     //   },
-    //   onEnd: async () => {
-    //     await Label.save(labels)
-    //     console.log('Finnish inserting: Label_Description.csv')
-    //   },
     // })
+    // console.log('Finnish inserting: Label_Description.csv')
+    // await Label.save(labels)
 
     const demoDataArr: DeepPartial<Data>[] = []
     await this.readCSVFile<Types.IFile_DemoData>({
@@ -40,11 +50,9 @@ export class AdminService {
           labelId: Number(data.Prediction),
         })
       },
-      onEnd: async () => {
-        await Data.save(demoDataArr)
-        console.log('Finnish inserting: demo_data.csv')
-      },
     })
+    console.log('Finnish inserting: demo_data.csv')
+    await Data.save(demoDataArr)
 
     return {
       message: 'OK',
