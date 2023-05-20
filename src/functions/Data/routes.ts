@@ -1,7 +1,8 @@
+import { AWS } from '@serverless/typescript'
 import { handlerPath } from '~core/lambda/handler-resolver'
 import schema from './schema'
 
-export default {
+const LambdaFunctionConfigs: AWS['functions'][any] = {
   handler: `${handlerPath(__dirname)}/index.main`,
   memorySize: 1024,
   timeout: 30,
@@ -21,3 +22,5 @@ export default {
     },
   ],
 }
+
+export default LambdaFunctionConfigs

@@ -3,17 +3,22 @@ import * as dotenv from 'dotenv'
 import { apiGatewayResources } from '~aws_resources/api-gateway'
 import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'
 
+dotenv.config()
+
 // Admin
 import AdminFunction from '~functions/Admin/routes'
-
 // Auth
 import AuthFunction from '~functions/Auth/routes'
 import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
-
 // Data
 import DataFunction from '~functions/Data/routes'
+// WebSocket
+import WebSocketFunction from '~functions/WebSocket/routes'
+// DynamoDB stream
+import DynamoDBStream from '~functions/DynamoDBStream/routes'
 
-dotenv.config()
+// const serviceName = 'estec-backend'
+// const defaultStage = 'alpha'
 
 const serverlessConfiguration: AWS = {
   service: 'estec-backend',
@@ -27,6 +32,10 @@ const serverlessConfiguration: AWS = {
 
     // CloudFormation stage
     stage: '${opt:stage, "alpha"}',
+
+    deploymentBucket: {
+      name: 'deployment-bucket--${self:service}-${self:provider.stage}',
+    },
 
     // AWS Lambda configs
     runtime: 'nodejs16.x',
@@ -48,6 +57,13 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      // WEBSOCKET_ENDPOINT: '${self:provider.stage}-${self:service}-websockets',
+      WEBSOCKET_WSS_ENDPOINT: {
+        'Fn::Join': ['', ['wss://', { Ref: 'WebsocketsApi' }, '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}']],
+      },
+      WEBSOCKET_HTTPS_ENDPOINT: {
+        'Fn::Join': ['', ['https://', { Ref: 'WebsocketsApi' }, '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}']],
+      },
       ...dynamoDBEnvironmentVariables,
     },
     iam: {
@@ -70,8 +86,14 @@ const serverlessConfiguration: AWS = {
     AuthFunction,
     AuthTokenValidation,
     DataFunction,
+    WebSocketFunction,
+    DynamoDBStream,
   },
-  package: { individually: true },
+  package: {
+    individually: true,
+    exclude: ['./node_modules/**'],
+    excludeDevDependencies: true,
+  },
   custom: {
     esbuild: {
       bundle: true,

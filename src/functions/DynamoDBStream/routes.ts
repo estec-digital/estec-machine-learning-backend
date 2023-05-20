@@ -1,20 +1,15 @@
 import { AWS } from '@serverless/typescript'
 import { handlerPath } from '~core/lambda/handler-resolver'
-import schema from './schema'
 
 const LambdaFunctionConfigs: AWS['functions'][any] = {
   handler: `${handlerPath(__dirname)}/index.main`,
+  memorySize: 1024,
+  timeout: 30,
   events: [
     {
-      http: {
-        method: 'POST',
-        path: 'auth',
-        cors: true,
-        request: {
-          schemas: {
-            'application/json': schema,
-          },
-        },
+      stream: {
+        type: 'dynamodb',
+        arn: process.env.WEBSOCKET_DYNAMODB_STREAM,
       },
     },
   ],
