@@ -12,7 +12,7 @@ const LambdaFunctionConfigs: AWS['functions'][any] = {
         method: 'POST',
         path: 'data',
         cors: true,
-        // authorizer: 'AuthTokenValidation',
+        authorizer: 'AuthTokenValidation',
         request: {
           schemas: {
             'application/json': schema,

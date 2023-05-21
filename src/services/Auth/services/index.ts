@@ -1,12 +1,12 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
-import { User } from '~db/entities/User'
+import { CUser, User } from '~db_nosql/schema/UserTable'
 import * as Types from '../types'
 
 export class AuthService {
   public static async register(params: Types.IRegister): Promise<Types.IRegisterResponse> {
-    const existingUser = await User.findOneBy({ username: params.username })
+    const existingUser = await User.get(params.username)
 
     if (existingUser instanceof User) {
       throw new Error('User is already registered. Please login.')
@@ -15,10 +15,10 @@ export class AuthService {
     const salt = bcrypt.genSaltSync(10)
     const hashedPassword = bcrypt.hashSync(params.password, salt)
 
-    const newUser = new User()
-    newUser.username = params.username
-    newUser.password = hashedPassword
-    await newUser.save()
+    await User.create({
+      username: params.username,
+      encryptedPassword: hashedPassword,
+    })
 
     return {
       message: 'Created user successfully!',
@@ -35,25 +35,11 @@ export class AuthService {
       throw new Error('Auth system is unavailable now!')
     }
 
-    const existingUser = await User.findOne({
-      select: {
-        id: true,
-        username: true,
-        password: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      where: {
-        username: params.username,
-      },
-    })
+    const existingUser = await User.get(params.username)
 
     if (existingUser instanceof User) {
-      if (bcrypt.compareSync(params.password, existingUser.password)) {
-        const authData: Types.IJwtAuthData = lodash.pick<User>(existingUser, [
+      if (bcrypt.compareSync(params.password, existingUser.encryptedPassword)) {
+        const authData: Types.IJwtAuthData = lodash.pick<CUser>(existingUser, [
           'id',
           'username',
           'firstName',

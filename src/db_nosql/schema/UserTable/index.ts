@@ -15,9 +15,22 @@ const userSchema = new dynamoose.Schema(
     encryptedPassword: {
       type: String,
     },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
   },
   {
     saveUnknown: false,
+    timestamps: {
+      createdAt: ['createdAt'],
+      updatedAt: ['updatedAt'],
+    },
   },
 )
 

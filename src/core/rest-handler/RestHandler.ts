@@ -1,6 +1,5 @@
 import { APIGatewayProxyResult } from 'aws-lambda'
 import * as lodash from 'lodash'
-import { AppDataSource } from 'src/db/AppDataSource'
 import HttpStatusCode from '~core/enums/http-status.enum'
 import { formatJSONErrorResponse, formatJSONSuccessResponse } from '~core/lambda/api-gateway'
 import { middyfy } from '~core/lambda/lambda'
@@ -94,8 +93,6 @@ export function RestHandler<TAllowAction>() {
 
     public static getHandlerFunction() {
       const handlerFunction = async (event, context) => {
-        // await AppDataSource.initializeConnection()
-
         this.restHandler = new RestHandlerWithActionAndPayload<TAllowAction>(lodash.cloneDeep(event), lodash.cloneDeep(context))
 
         this.setActions()

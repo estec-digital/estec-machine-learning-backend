@@ -57,16 +57,6 @@ export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transfo
     },
   },
 
-  PredictionLabelTable: {
-    Type: 'AWS::DynamoDB::Table',
-    Properties: {
-      TableName: generateResourceName('PredictionLabel'),
-      AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'N' }],
-      KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
-      BillingMode: 'PAY_PER_REQUEST',
-    },
-  },
-
   WebSocketConnectionTable: {
     Type: 'AWS::DynamoDB::Table',
     Properties: {
@@ -81,6 +71,5 @@ export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transfo
 export const dynamoDBEnvironmentVariables: AWS['provider']['environment'] = {
   DYNAMO_DB_TABLE_NAME__UserTable: generateResourceName('User'),
   DYNAMO_DB_TABLE_NAME__SensorDataTable: generateResourceName('SensorData'),
-  DYNAMO_DB_TABLE_NAME__PredictionLabelTable: generateResourceName('PredictionLabel'),
   DYNAMO_DB_TABLE_NAME__WebSocketConnectionTable: generateResourceName('WebSocketConnection'),
 }

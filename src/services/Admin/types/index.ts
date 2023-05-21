@@ -23,5 +23,5 @@ export interface IFile_DemoData {
 export interface IFile_LabelDescription {
   Label: string
   Status: string
-  Desccription: string
+  Description: string
 }

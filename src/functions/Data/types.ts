@@ -1,3 +1,3 @@
-type TDataAction = 'get-data' | 'test'
+type TDataAction = 'query-data'
 
 export type TAllowAction = TDataAction

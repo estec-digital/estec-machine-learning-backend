@@ -1,22 +1,20 @@
-import dayjs from 'dayjs'
-import { Raw } from 'typeorm'
-import { Data } from '~db/entities/Data'
+import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
+import { CSensorData, SensorData } from '~db_nosql/schema/SensorDataTable'
 import * as Types from '../types'
 
 export class DataService {
-  public static async getData(params: Types.IGetData): Promise<Types.IGetDataResponse> {
-    const data = await Data.find({
-      where: {
-        datetime: Raw((columnAlias) => `${columnAlias} >= '${dayjs(params.fromDate).format()}' AND ${columnAlias} <= '${dayjs(params.toDate).format()}'`),
+  public static async queryData(params: Types.IQuerySensorData): Promise<QueryResponse<CSensorData>> {
+    const data = await SensorData.query({
+      date: {
+        eq: params.partition,
       },
-      relations: {
-        Label: true,
+      time: {
+        // between: ['01:00:00', '05:00:00'],
+        ...(params.range ?? {}),
       },
-    })
-    return {
-      fromDate: params.fromDate,
-      toDate: params.toDate,
-      data,
-    }
+    }).exec()
+
+    // const data = await SensorData.query('date').eq('2022-08-28').between('00:00:00', '01:00:00').exec()
+    return data
   }
 }

@@ -1,6 +1,5 @@
 import * as dynamoose from 'dynamoose'
 import { Item } from 'dynamoose/dist/Item'
-import { CPredictionLabel, PredictionLabel } from '../PredictionLabelTable'
 
 export class CSensorData extends Item {
   date: string
@@ -9,8 +8,10 @@ export class CSensorData extends Item {
   nOx_GA01: number
   oxi_GA01: number
   kiln_inlet_temp: number
-  labelId: number
-  Label: CPredictionLabel
+  prediction: {
+    status: string
+    description: string
+  }
 }
 
 const sensorDataSchema = new dynamoose.Schema(
@@ -35,11 +36,16 @@ const sensorDataSchema = new dynamoose.Schema(
     kiln_inlet_temp: {
       type: Number,
     },
-    labelId: {
-      type: Number,
-    },
-    Label: {
-      type: PredictionLabel,
+    prediction: {
+      type: Object,
+      schema: {
+        status: {
+          type: String,
+        },
+        description: {
+          type: String,
+        },
+      },
     },
   },
   {
