@@ -9,7 +9,13 @@ const LambdaFunctionConfigs: AWS['functions'][any] = {
     {
       stream: {
         type: 'dynamodb',
-        arn: process.env.WEBSOCKET_DYNAMODB_STREAM,
+        arn: process.env.WEBSOCKET_CONNECTION_DYNAMODB_STREAM,
+      },
+    },
+    {
+      stream: {
+        type: 'dynamodb',
+        arn: process.env.WEBSOCKET_SENSOR_DATA_DYNAMODB_STREAM,
       },
     },
   ],

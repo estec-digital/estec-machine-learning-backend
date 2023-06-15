@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
-import { CUser, User } from '~db_nosql/schema/UserTable'
+import { CUser, User } from '~root/dynamodb/schema/UserTable'
 import * as Types from '../types'
 
 export class AuthService {

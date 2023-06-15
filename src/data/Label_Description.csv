@@ -1,44 +1,44 @@
 Label,Status,Description
-1,"BZT thap, OXY thap, BET thap","Tang gio lo, tang mot it nhien lieu"
-2,"BZT thap, OXY thap, BET thap","Tang gio lo, tang mot it nhien lieu, giam toc do lo, giam mot it lieu"
-3,"BZT thap, OXY thap, BET on","Tang nhe gio lo, giam mot it nhien lieu, giam toc do lo, giam mot chut lieu"
-4,"BZT thap, OXY thap, BET cao","Giam mot chut nhien lieu, giam gio lo, giam toc do lo, giam mot it lieu"
-5,"BZT thap, OXY on, BET thap","Tang gio lo, tang nhien lieu"
-6,"BZT thap, OXY on, BET thap","Tang nhe gio lo, tang nhien lieu, giam toc do lo, giam mot it lieu"
-7,"BZT thap, OXY on, BET on",Tang nhien lieu
-8,"BZT thap, OXY on, BET on","Tang nhe gio lo, tang mot it nhien lieu, giam toc do lo, giam mot it lieu"
-9,"BZT thap, OXY on, BET cao",Giam gio lo
-10,"BZT thap, OXY on, BET cao","Giam mot it nhien lieu, giam gio lo, giam toc do lo, giam mot it lieu"
-11,"BZT thap, OXY cao, BET thap",Tang nhien lieu
-12,"BZT thap, OXY cao, BET thap","Tang nhien lieu, giam toc do lo, giam mot it lieu"
-13,"BZT thap, OXY cao, BET on",Tang nhien lieu
-14,"BZT thap, OXY cao, BET on","Tang nhien lieu, giam toc do lo, giam mot it lieu"
-15,"BZT thap, OXY cao, BET cao","Tang nhien lieu, giam gio lo"
-16,"BZT thap, OXY cao, BET cao","Tang nhien lieu, giam gio lo, giam toc do lo, giam mot it lieu"
-17,"BZT on, OXY thap, BET thap","Tang gio lo, tang mot it nhien lieu"
-18,"BZT on, OXY thap, BET on","Tang gio lo, tang mot it nhien lieu"
-19,"BZT on, OXY thap, BET cao","Giam nhien lieu, giam mot it gio lo"
-20,"BZT on, OXY on, BET thap","Tang gio lo, tang mot it nhien lieu"
-21,"BZT on, OXY on, BET on","Tang gio lo, tang nhien lieu, tang lieu, tang toc do lo"
-22,"BZT on, OXY on, BET cao",Giam gio lo
-23,"BZT on, OXY on, BET cao","Giam mot it nhien lieu, giam gio lo"
-24,"BZT on, OXY cao, BET thap","Tang mot it gio lo, tang nhien lieu"
-25,"BZT on, OXY cao, BET on","Giam gio lo, giam mot it nhiet lieu"
-26,"BZT on, OXY cao, BET cao","Giam gio lo, giam mot it nhiet lieu"
-27,"BZT cao, OXY thap, BET thap",Tang gio lo
-28,"BZT cao, OXY thap, BET thap","Tang gio lo, tang toc do lo, tang lieu"
-29,"BZT cao, OXY thap, BET on",Tang gio lo
-30,"BZT cao, OXY thap, BET cao",Tang gio lo
-31,"BZT cao, OXY thap, BET cao","Tang gio lo, tang toc do lo, tang lieu"
-32,"BZT cao, OXY on, BET thap",Tang gio lo
-33,"BZT cao, OXY on, BET thap","Tang gio lo, tang toc do lo, tang lieu"
-34,"BZT cao, OXY on, BET on",Giam nhien lieu
-35,"BZT cao, OXY on, BET on","Giam nhien lieu, tang mot it toc do lo, tang mot chut lieu"
-36,"BZT cao, OXY on, BET cao",Giam nhien lieu
-37,"BZT cao, OXY on, BET cao","Giam nhien lieu, tang toc do lo, tang lieu"
-38,"BZT cao, OXY cao, BET thap",Giam nhien lieu
-39,"BZT cao, OXY cao, BET thap","Tang gio lo, tang toc do lo, tang lieu"
-40,"BZT cao, OXY cao, BET on",Giam nhien lieu
-41,"BZT cao, OXY cao, BET on","Tang gio lo, tang toc do lo, tang lieu"
-42,"BZT cao, OXY cao, BET cao","Giam nhien lieu, giam mot it gio lo"
-43,"BZT cao, OXY cao, BET cao","Giam nhien lieu, giam mot it gio lo, tang toc do lo, tang lieu"
+1,"BZT thấp, OXY thấp, BET thấp","Tăng gió lò, Tăng một ít nhiên liệu"
+2,"BZT thấp, OXY thấp, BET thấp","Tăng gió lò, Tăng một ít nhiên liệu, Giảm tốc độ lò, Giảm một ít liệu"
+3,"BZT thấp, OXY thấp, BET ổn","Tăng nhẹ gió lò, Giảm một ít nhiên liệu, Giảm tốc độ lò, Giảm một chút liệu"
+4,"BZT thấp, OXY thấp, BET cao","Giảm một chút nhiên liệu, Giảm gió lò, Giảm tốc độ lò, Giảm một ít liệu"
+5,"BZT thấp, OXY ổn, BET thấp","Tăng gió lò, Tăng nhiên liệu"
+6,"BZT thấp, OXY ổn, BET thấp","Tăng nhẹ gió lò, Tăng nhiên liệu, Giảm tốc độ lò, Giảm một ít liệu"
+7,"BZT thấp, OXY ổn, BET ổn",Tăng nhiên liệu
+8,"BZT thấp, OXY ổn, BET ổn","Tăng nhẹ gió lò, Tăng một ít nhiên liệu, Giảm tốc độ lò, Giảm một ít liệu"
+9,"BZT thấp, OXY ổn, BET cao",Giảm gió lò
+10,"BZT thấp, OXY ổn, BET cao","Giảm một ít nhiên liệu, Giảm gió lò, Giảm tốc độ lò, Giảm một ít liệu"
+11,"BZT thấp, OXY cao, BET thấp",Tăng nhiên liệu
+12,"BZT thấp, OXY cao, BET thấp","Tăng nhiên liệu, Giảm tốc độ lò, Giảm một ít liệu"
+13,"BZT thấp, OXY cao, BET ổn",Tăng nhiên liệu
+14,"BZT thấp, OXY cao, BET ổn","Tăng nhiên liệu, Giảm tốc độ lò, Giảm một ít liệu"
+15,"BZT thấp, OXY cao, BET cao","Tăng nhiên liệu, Giảm gió lò"
+16,"BZT thấp, OXY cao, BET cao","Tăng nhiên liệu, Giảm gió lò, Giảm tốc độ lò, Giảm một ít liệu"
+17,"BZT ổn, OXY thấp, BET thấp","Tăng gió lò, Tăng một ít nhiên liệu"
+18,"BZT ổn, OXY thấp, BET ổn","Tăng gió lò, Tăng một ít nhiên liệu"
+19,"BZT ổn, OXY thấp, BET cao","Giảm nhiên liệu, Giảm một ít gió lò"
+20,"BZT ổn, OXY ổn, BET thấp","Tăng gió lò, Tăng một ít nhiên liệu"
+21,"BZT ổn, OXY ổn, BET ổn","Tăng gió lò, Tăng nhiên liệu, Tăng liệu, Tăng tốc độ lò"
+22,"BZT ổn, OXY ổn, BET cao",Giảm gió lò
+23,"BZT ổn, OXY ổn, BET cao","Giảm một ít nhiên liệu, Giảm gió lò"
+24,"BZT ổn, OXY cao, BET thấp","Tăng một ít gió lò, Tăng nhiên liệu"
+25,"BZT ổn, OXY cao, BET ổn","Giảm gió lò, Giảm một ít nhiên liệu"
+26,"BZT ổn, OXY cao, BET cao","Giảm gió lò, Giảm một ít nhiên liệu"
+27,"BZT cao, OXY thấp, BET thấp",Tăng gió lò
+28,"BZT cao, OXY thấp, BET thấp","Tăng gió lò, Tăng tốc độ lò, Tăng liệu"
+29,"BZT cao, OXY thấp, BET ổn",Tăng gió lò
+30,"BZT cao, OXY thấp, BET cao",Tăng gió lò
+31,"BZT cao, OXY thấp, BET cao","Tăng gió lò, Tăng tốc độ lò, Tăng liệu"
+32,"BZT cao, OXY ổn, BET thấp",Tăng gió lò
+33,"BZT cao, OXY ổn, BET thấp","Tăng gió lò, Tăng tốc độ lò, Tăng liệu"
+34,"BZT cao, OXY ổn, BET ổn",Giảm nhiên liệu
+35,"BZT cao, OXY ổn, BET ổn","Giảm nhiên liệu, Tăng một ít tốc độ lò, Tăng một chút liệu"
+36,"BZT cao, OXY ổn, BET cao",Giảm nhiên liệu
+37,"BZT cao, OXY ổn, BET cao","Giảm nhiên liệu, Tăng tốc độ lò, Tăng liệu"
+38,"BZT cao, OXY cao, BET thấp",Giảm nhiên liệu
+39,"BZT cao, OXY cao, BET thấp","Tăng gió lò, Tăng tốc độ lò, Tăng liệu"
+40,"BZT cao, OXY cao, BET ổn",Giảm nhiên liệu
+41,"BZT cao, OXY cao, BET ổn","Tăng gió lò, Tăng tốc độ lò, Tăng liệu"
+42,"BZT cao, OXY cao, BET cao","Giảm nhiên liệu, Giảm một ít gió lò"
+43,"BZT cao, OXY cao, BET cao","Giảm nhiên liệu, Giảm một ít gió lò, Tăng tốc độ lò, Tăng liệu"

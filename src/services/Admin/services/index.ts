@@ -2,7 +2,7 @@ import csv from 'csv-parser'
 import dayjs from 'dayjs'
 import fs from 'fs'
 import { executeConcurrently } from '~core/dynamoose/model'
-import { CSensorData, SensorData } from '~db_nosql/schema/SensorDataTable'
+import { CSensorData, SensorData } from '~root/dynamodb/schema/SensorDataTable'
 import * as Types from '../types'
 
 export class AdminService {

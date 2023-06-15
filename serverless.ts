@@ -27,15 +27,10 @@ const serverlessConfiguration: AWS = {
   provider: {
     // Cloud provider's name and region
     name: 'aws',
-    // region: 'ap-southeast-1',
-    region: 'eu-north-1',
+    region: process.env.REGION as AWS['provider']['region'],
 
     // CloudFormation stage
     stage: '${opt:stage, "alpha"}',
-
-    deploymentBucket: {
-      name: 'deployment-bucket--${self:service}-${self:provider.stage}',
-    },
 
     // AWS Lambda configs
     runtime: 'nodejs16.x',
