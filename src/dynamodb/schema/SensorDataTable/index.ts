@@ -5,14 +5,14 @@ export class CSensorData extends Item {
   Date: string
   Time: string
   SensorData: {
-    GA01_Oxi: number
-    GA02_Oxi: number
-    GA03_Oxi: number
-    GA04_Oxi: number
-    KilnDriAmp: number
-    KilnInletTemp: number
-    Nox: number
-    Pyrometer: number
+    GA01_Oxi?: number
+    GA02_Oxi?: number
+    GA03_Oxi?: number
+    GA04_Oxi?: number
+    KilnDriAmp?: number
+    KilnInletTemp?: number
+    Nox?: number
+    Pyrometer?: number
   }
   Prediction: {
     Status: string
@@ -58,6 +58,7 @@ const sensorDataSchema = new dynamoose.Schema(
           type: Number,
         },
       },
+      default: {},
     },
     Prediction: {
       type: Object,

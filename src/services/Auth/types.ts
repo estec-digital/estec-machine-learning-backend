@@ -5,7 +5,12 @@ export interface IRegister {
   password: string
 }
 
-export interface IRegisterResponse {}
+export interface IRegisterResponse {
+  message: string
+  user: {
+    Username: string
+  }
+}
 
 export interface ILogin {
   username: string

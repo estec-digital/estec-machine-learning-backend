@@ -4,14 +4,18 @@ import { Item } from 'dynamoose/dist/Item'
 export class CRawData extends Item {
   Date: string // YYYY-DD-MM
   Time: string // HH:mm:ss
-  '4G1GA01XAC01_NO_AVG': number
-  '4G1GA01XAC01_O2_AVG': number
-  '4G1GA02XAC01_O2_AVG': number
-  '4G1GA03XAC01_O2_AVG': number
-  '4G1GA04XAC01_O2_AVG': number
-  '4G1KJ01JST00_T8401_AVG': number
-  '4K1KP01DRV01_M2001_EI_AVG': number
-  '4K1KP01KHE01_B8701_AVG': number
+  '4G1GA01XAC01_NO_AVG'?: number
+  '4G1GA01XAC01_O2_AVG'?: number
+  '4G1GA02XAC01_O2_AVG'?: number
+  '4G1GA03XAC01_O2_AVG'?: number
+  '4G1GA04XAC01_O2_AVG'?: number
+  '4G1KJ01JST00_T8401_AVG'?: number
+  '4K1KP01DRV01_M2001_EI_AVG'?: number
+  '4K1KP01KHE01_B8701_AVG'?: number
+
+  note: {
+    triggedFnProcessDataToAppDB: boolean
+  }
 }
 
 const rawDataSchema = new dynamoose.Schema(
@@ -48,6 +52,17 @@ const rawDataSchema = new dynamoose.Schema(
     '4K1KP01KHE01_B8701_AVG': {
       type: Number,
     },
+    note: {
+      type: Object,
+      schema: {
+        triggedFnProcessDataToAppDB: {
+          type: Boolean,
+        },
+      },
+      default: {
+        triggedFnProcessDataToAppDB: false,
+      },
+    },
   },
   {
     // saveUnknown: false,
@@ -57,4 +72,4 @@ const rawDataSchema = new dynamoose.Schema(
   },
 )
 
-export const SensorData = dynamoose.model<CRawData>(process.env.DYNAMO_DB_TABLE_NAME__RawDataTable, rawDataSchema)
+export const RawData = dynamoose.model<CRawData>(process.env.DYNAMO_DB_TABLE_NAME__RawDataTable, rawDataSchema)

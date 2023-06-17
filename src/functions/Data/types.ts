@@ -1,3 +1,3 @@
-type TDataAction = 'get-data' | 'query-data' | 'put-data' | 'insert-data' | 'update-prediction'
+type TDataAction = 'insert-raw-data' | 'query-sensor-data'
 
 export type TAllowAction = TDataAction
