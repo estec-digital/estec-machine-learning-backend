@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
 import { CUser, User } from '~root/dynamodb/schema/UserTable'
-import * as Types from '../types'
+import * as Types from './types'
 
 export class AuthService {
   public static async register(params: Types.IRegister): Promise<Types.IRegisterResponse> {
@@ -16,14 +16,14 @@ export class AuthService {
     const hashedPassword = bcrypt.hashSync(params.password, salt)
 
     await User.create({
-      username: params.username,
-      encryptedPassword: hashedPassword,
+      Username: params.username,
+      EncryptedPassword: hashedPassword,
     })
 
     return {
       message: 'Created user successfully!',
       user: {
-        username: params.username,
+        Username: params.username,
       },
     }
   }
@@ -38,17 +38,8 @@ export class AuthService {
     const existingUser = await User.get(params.username)
 
     if (existingUser instanceof User) {
-      if (bcrypt.compareSync(params.password, existingUser.encryptedPassword)) {
-        const authData: Types.IJwtAuthData = lodash.pick<CUser>(existingUser, [
-          'id',
-          'username',
-          'firstName',
-          'lastName',
-          'email',
-          'fullName',
-          'createdAt',
-          'updatedAt',
-        ]) as Types.IJwtAuthData
+      if (bcrypt.compareSync(params.password, existingUser.EncryptedPassword)) {
+        const authData: Types.TJwtAuthData = lodash.pick<CUser>(existingUser, ['Username', 'FirstName', 'LastName', 'Email']) as Types.TJwtAuthData
 
         return {
           message: 'Login successfully!',

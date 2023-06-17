@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
 import { CSensorData, SensorData } from '~root/dynamodb/schema/SensorDataTable'
-import * as Types from '../types'
+import * as Types from './types'
 
 export class DataService {
   public static async getData(params: Types.IGetData): Promise<CSensorData> {
@@ -44,7 +44,7 @@ export class DataService {
   public static async updatePrediction(params: Types.IUpdatePrediction): Promise<any> {
     const data = await SensorData.get({ date: params.date, time: params.time })
     if (data && params.prediction) {
-      data.prediction = params.prediction
+      data.Prediction = params.prediction
       await data.save()
       return true
     }

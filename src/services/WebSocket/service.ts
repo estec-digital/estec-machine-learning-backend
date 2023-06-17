@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
 import * as AWS from 'aws-sdk'
 import { WebSocketConnection } from '~root/dynamodb/schema/WebSocketConnectionTable'
-import * as Types from '../types'
+import * as Types from './types'
 
 const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
@@ -11,9 +11,9 @@ const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
 export class WebSocketService {
   public static async connect(event: APIGatewayProxyEvent, context: Context) {
     await WebSocketConnection.create({
-      connectionId: event.requestContext.connectionId,
-      connectedAt: event.requestContext.connectedAt,
-      context: event.requestContext,
+      ConnectionId: event.requestContext.connectionId,
+      ConnectedAt: event.requestContext.connectedAt,
+      Context: event.requestContext,
     })
 
     return true
@@ -45,12 +45,12 @@ export class WebSocketService {
           for (const connection of connections) {
             try {
               await WebSocketService.getAPIGatewayManagementApiInstance()
-                .postToConnection({ ConnectionId: connection.connectionId, Data: JSON.stringify(params.data) })
+                .postToConnection({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(params.data) })
                 .promise()
             } catch (error) {
-              await WebSocketConnection.batchDelete([{ connectionId: connection.connectionId }])
+              await WebSocketConnection.batchDelete([{ connectionId: connection.ConnectionId }])
               if (error.statusCode === 410 || error.statusCode === 404) {
-                console.log(`Connection id: "${connection.connectionId}" is closed or not found.`)
+                console.log(`Connection id: "${connection.ConnectionId}" is closed or not found.`)
               } else {
                 console.error('Error sending message:', error)
               }

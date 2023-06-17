@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import fs from 'fs'
 import { executeConcurrently } from '~core/dynamoose/model'
 import { CSensorData, SensorData } from '~root/dynamodb/schema/SensorDataTable'
-import * as Types from '../types'
+import * as Types from './types'
 
 export class AdminService {
   private static async readCSVFile<RowType>(params: Types.IReadCSVFile<RowType>) {
@@ -35,8 +35,8 @@ export class AdminService {
       file: 'src/data/demo_data.csv',
       onData: async (data) => {
         demoDataArr.push({
-          date: dayjs(`${data.Date} ${data.Time}`, 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD'),
-          time: dayjs(`${data.Date} ${data.Time}`, 'MM/DD/YYYY HH:mm:ss').format('HH:mm:ss'),
+          Date: dayjs(`${data.Date} ${data.Time}`, 'MM/DD/YYYY HH:mm:ss').format('YYYY-MM-DD'),
+          Time: dayjs(`${data.Date} ${data.Time}`, 'MM/DD/YYYY HH:mm:ss').format('HH:mm:ss'),
           pyrometer: Number(data.Pyrometer),
           nOx_GA01: Number(data.NOx_GA01),
           oxi_GA01: Number(data.Oxi_GA01),

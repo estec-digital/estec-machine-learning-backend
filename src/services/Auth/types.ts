@@ -1,5 +1,4 @@
-import { DeepPartial } from 'typeorm'
-import { User } from '~db/entities/User'
+import { CUser } from '~root/dynamodb/schema/UserTable'
 
 export interface IRegister {
   username: string
@@ -15,14 +14,8 @@ export interface ILogin {
 
 export interface ILoginResponse {
   message: string
-  user: DeepPartial<User>
+  user: Partial<CUser>
   token: string
 }
 
-export interface IJwtAuthData {
-  id: string
-  username: string
-  firstName: string
-  lastName: string
-  email: string
-}
+export type TJwtAuthData = Pick<CUser, 'Username' | 'FirstName' | 'LastName' | 'Email'>

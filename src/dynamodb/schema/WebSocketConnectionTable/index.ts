@@ -2,21 +2,21 @@ import * as dynamoose from 'dynamoose'
 import { Item } from 'dynamoose/dist/Item'
 
 export class CWebSocketConnection extends Item {
-  connectionId: string
-  connectedAt: number
-  context: Object
+  ConnectionId: string
+  ConnectedAt: number
+  Context: Object
 }
 
 const webSocketConnectionSchema = new dynamoose.Schema(
   {
-    connectionId: {
+    ConnectionId: {
       type: String,
       hashKey: true,
     },
-    connectedAt: {
+    ConnectedAt: {
       type: Number,
     },
-    context: {
+    Context: {
       type: Object,
     },
   },

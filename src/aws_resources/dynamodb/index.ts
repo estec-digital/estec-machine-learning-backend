@@ -6,8 +6,24 @@ export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transfo
     Type: 'AWS::DynamoDB::Table',
     Properties: {
       TableName: generateResourceName('User'),
-      AttributeDefinitions: [{ AttributeName: 'username', AttributeType: 'S' }],
-      KeySchema: [{ AttributeName: 'username', KeyType: 'HASH' }],
+      AttributeDefinitions: [{ AttributeName: 'Username', AttributeType: 'S' }],
+      KeySchema: [{ AttributeName: 'Username', KeyType: 'HASH' }],
+      BillingMode: 'PAY_PER_REQUEST',
+    },
+  },
+
+  RawDataTable: {
+    Type: 'AWS::DynamoDB::Table',
+    Properties: {
+      TableName: generateResourceName('RawData'),
+      AttributeDefinitions: [
+        { AttributeName: 'Date', AttributeType: 'S' },
+        { AttributeName: 'Time', AttributeType: 'S' },
+      ],
+      KeySchema: [
+        { AttributeName: 'Date', KeyType: 'HASH' },
+        { AttributeName: 'Time', KeyType: 'RANGE' },
+      ],
       BillingMode: 'PAY_PER_REQUEST',
     },
   },
@@ -17,12 +33,12 @@ export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transfo
     Properties: {
       TableName: generateResourceName('SensorData'),
       AttributeDefinitions: [
-        { AttributeName: 'date', AttributeType: 'S' },
-        { AttributeName: 'time', AttributeType: 'S' },
+        { AttributeName: 'Date', AttributeType: 'S' },
+        { AttributeName: 'Time', AttributeType: 'S' },
       ],
       KeySchema: [
-        { AttributeName: 'date', KeyType: 'HASH' },
-        { AttributeName: 'time', KeyType: 'RANGE' },
+        { AttributeName: 'Date', KeyType: 'HASH' },
+        { AttributeName: 'Time', KeyType: 'RANGE' },
       ],
       // LocalSecondaryIndexes: [
       //   {
@@ -61,8 +77,8 @@ export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transfo
     Type: 'AWS::DynamoDB::Table',
     Properties: {
       TableName: generateResourceName('WebSocketConnection'),
-      AttributeDefinitions: [{ AttributeName: 'connectionId', AttributeType: 'S' }],
-      KeySchema: [{ AttributeName: 'connectionId', KeyType: 'HASH' }],
+      AttributeDefinitions: [{ AttributeName: 'ConnectionId', AttributeType: 'S' }],
+      KeySchema: [{ AttributeName: 'ConnectionId', KeyType: 'HASH' }],
       BillingMode: 'PAY_PER_REQUEST',
     },
   },
@@ -70,6 +86,7 @@ export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transfo
 
 export const dynamoDBEnvironmentVariables: AWS['provider']['environment'] = {
   DYNAMO_DB_TABLE_NAME__UserTable: generateResourceName('User'),
+  DYNAMO_DB_TABLE_NAME__RawDataTable: generateResourceName('RawData'),
   DYNAMO_DB_TABLE_NAME__SensorDataTable: generateResourceName('SensorData'),
   DYNAMO_DB_TABLE_NAME__WebSocketConnectionTable: generateResourceName('WebSocketConnection'),
 }

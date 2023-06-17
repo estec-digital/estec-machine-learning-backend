@@ -6,12 +6,12 @@ export interface IQuerySensorData {
 }
 
 export interface IGetData {
-  date: CSensorData['date']
-  time: CSensorData['time']
+  date: CSensorData['Date']
+  time: CSensorData['Time']
 }
 
 export interface IUpdatePrediction {
-  date: CSensorData['date']
-  time: CSensorData['time']
-  prediction: CSensorData['prediction']
+  date: CSensorData['Date']
+  time: CSensorData['Time']
+  prediction: CSensorData['Prediction']
 }

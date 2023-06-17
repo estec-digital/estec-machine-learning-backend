@@ -2,34 +2,37 @@ import * as dynamoose from 'dynamoose'
 import { Item } from 'dynamoose/dist/Item'
 
 export class CUser extends Item {
-  username: string
-  encryptedPassword: string
+  Username: string
+  EncryptedPassword: string
+  FirstName: string
+  LastName: string
+  Email: string
 }
 
 const userSchema = new dynamoose.Schema(
   {
-    username: {
+    Username: {
       type: String,
       hashKey: true,
     },
-    encryptedPassword: {
+    EncryptedPassword: {
       type: String,
     },
-    firstName: {
+    FirstName: {
       type: String,
     },
-    lastName: {
+    LastName: {
       type: String,
     },
-    email: {
+    Email: {
       type: String,
     },
   },
   {
     saveUnknown: false,
     timestamps: {
-      createdAt: ['createdAt'],
-      updatedAt: ['updatedAt'],
+      createdAt: ['CreatedAt'],
+      updatedAt: ['UpdatedAt'],
     },
   },
 )

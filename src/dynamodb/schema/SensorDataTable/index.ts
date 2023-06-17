@@ -2,47 +2,70 @@ import * as dynamoose from 'dynamoose'
 import { Item } from 'dynamoose/dist/Item'
 
 export class CSensorData extends Item {
-  date: string
-  time: string
-  pyrometer: number
-  nOx_GA01: number
-  oxi_GA01: number
-  kiln_inlet_temp: number
-  prediction: {
-    status: string
-    description: string
+  Date: string
+  Time: string
+  SensorData: {
+    GA01_Oxi: number
+    GA02_Oxi: number
+    GA03_Oxi: number
+    GA04_Oxi: number
+    KilnDriAmp: number
+    KilnInletTemp: number
+    Nox: number
+    Pyrometer: number
+  }
+  Prediction: {
+    Status: string
+    Description: string
   }
 }
 
 const sensorDataSchema = new dynamoose.Schema(
   {
-    date: {
+    Date: {
       type: String,
       hashKey: true,
     },
-    time: {
+    Time: {
       type: String,
       rangeKey: true,
     },
-    pyrometer: {
-      type: Number,
-    },
-    nOx_GA01: {
-      type: Number,
-    },
-    oxi_GA01: {
-      type: Number,
-    },
-    kiln_inlet_temp: {
-      type: Number,
-    },
-    prediction: {
+    SensorData: {
       type: Object,
       schema: {
-        status: {
+        GA01_Oxi: {
+          type: Number,
+        },
+        GA02_Oxi: {
+          type: Number,
+        },
+        GA03_Oxi: {
+          type: Number,
+        },
+        GA04_Oxi: {
+          type: Number,
+        },
+        KilnDriAmp: {
+          type: Number,
+        },
+        KilnInletTemp: {
+          type: Number,
+        },
+        Nox: {
+          type: Number,
+        },
+        Pyrometer: {
+          type: Number,
+        },
+      },
+    },
+    Prediction: {
+      type: Object,
+      schema: {
+        Status: {
           type: String,
         },
-        description: {
+        Description: {
           type: String,
         },
       },
@@ -51,8 +74,7 @@ const sensorDataSchema = new dynamoose.Schema(
   {
     saveUnknown: false,
     timestamps: {
-      // createdAt: ['createdAt'],
-      updatedAt: ['updatedAt'],
+      updatedAt: ['UpdatedAt'],
     },
   },
 )
