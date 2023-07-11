@@ -12,15 +12,11 @@ Please use **yarn** instead of npm and don't push **package-lock.json** to this 
 git clone <repo-link>
 ```
 
-<br/>
-
 2. If you don't have Serverless globally in your machine, please install it (only use npm at this time):
 
 ```
 npm install -g serverless
 ```
-
-<br/>
 
 3. Install Packages
 
@@ -28,14 +24,10 @@ npm install -g serverless
 yarn install
 ```
 
-<br/>
-
 4. Configs environment variables
 
 - Create a new **.env** file with same structure as **.env.example**
 - Fill in your configs information in the **.env** file.
-
-<br/>
 
 5. Start Project
 
