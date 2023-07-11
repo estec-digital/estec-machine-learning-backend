@@ -16,7 +16,8 @@ export class CSensorData extends Item {
   }
   Prediction: {
     Status: string
-    Description: string
+    RecommendationActions: string
+    Reliability: number
   }
 }
 
@@ -64,16 +65,19 @@ const sensorDataSchema = new dynamoose.Schema(
       type: Object,
       schema: {
         Status: {
-          type: String,
+          type: Object,
         },
-        Description: {
-          type: String,
+        RecommendationActions: {
+          type: Object,
+        },
+        Reliability: {
+          type: Number,
         },
       },
     },
   },
   {
-    saveUnknown: false,
+    saveUnknown: ['Prediction.Status.**', 'Prediction.RecommendationActions.**'],
     timestamps: {
       updatedAt: ['UpdatedAt'],
     },

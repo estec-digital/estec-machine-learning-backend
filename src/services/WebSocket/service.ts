@@ -32,23 +32,36 @@ export class WebSocketService {
   }
 
   public static async postData(params: Types.TPostData): Promise<boolean> {
+    console.log('Line35: ', JSON.stringify(params))
     try {
       switch (params.type) {
         case 'POST_TO_SINGLE_CONNECTION': {
-          await WebSocketService.getAPIGatewayManagementApiInstance()
-            .postToConnection({ ConnectionId: params.connectionId, Data: JSON.stringify(params.data) })
-            .promise()
+          const data = await params.data()
+          try {
+            await WebSocketService.getAPIGatewayManagementApiInstance()
+              .postToConnection({ ConnectionId: params.connectionId, Data: JSON.stringify(data) })
+              .promise()
+          } catch (error) {
+            await WebSocketConnection.delete({ ConnectionId: params.connectionId })
+            if (error.statusCode === 410 || error.statusCode === 404) {
+              console.log(`Connection id: "${params.connectionId}" is closed or not found.`)
+            } else {
+              console.error('Error sending message:', error)
+            }
+          }
           return true
         }
         case 'POST_TO_ALL_CONNECTIONS': {
           const connections = await WebSocketConnection.scan().exec()
+          const data = await params.data()
+          console.log('Line47: ', JSON.stringify(data))
           for (const connection of connections) {
             try {
               await WebSocketService.getAPIGatewayManagementApiInstance()
-                .postToConnection({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(params.data) })
+                .postToConnection({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(data) })
                 .promise()
             } catch (error) {
-              await WebSocketConnection.batchDelete([{ connectionId: connection.ConnectionId }])
+              await WebSocketConnection.delete({ ConnectionId: connection.ConnectionId })
               if (error.statusCode === 410 || error.statusCode === 404) {
                 console.log(`Connection id: "${connection.ConnectionId}" is closed or not found.`)
               } else {

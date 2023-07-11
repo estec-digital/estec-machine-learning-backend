@@ -12,6 +12,8 @@ if (process.env.WEBSOCKET_CONNECTION_DYNAMODB_STREAM) {
   LambdaFunctionConfigs.events.push({
     stream: {
       type: 'dynamodb',
+      batchSize: 3,
+      batchWindow: 3,
       arn: process.env.WEBSOCKET_CONNECTION_DYNAMODB_STREAM,
     },
   })
@@ -21,6 +23,8 @@ if (process.env.WEBSOCKET_RAW_DATA_DYNAMODB_STREAM) {
   LambdaFunctionConfigs.events.push({
     stream: {
       type: 'dynamodb',
+      batchSize: 3,
+      batchWindow: 3,
       arn: process.env.WEBSOCKET_RAW_DATA_DYNAMODB_STREAM,
     },
   })
@@ -30,6 +34,8 @@ if (process.env.WEBSOCKET_SENSOR_DATA_DYNAMODB_STREAM) {
   LambdaFunctionConfigs.events.push({
     stream: {
       type: 'dynamodb',
+      batchSize: 3,
+      batchWindow: 3,
       arn: process.env.WEBSOCKET_SENSOR_DATA_DYNAMODB_STREAM,
     },
   })

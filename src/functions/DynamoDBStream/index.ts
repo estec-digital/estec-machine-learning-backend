@@ -2,6 +2,7 @@ import { DynamoDBStreamHandler } from 'aws-lambda'
 import { DynamoDBStreamService } from '~services/DynamoDBStream'
 
 export const main: DynamoDBStreamHandler = async (event, context) => {
+  console.log(JSON.stringify({ dynamoDBStreamEvent: event }))
   try {
     for (const record of event.Records) {
       // Process each record in the DynamoDB stream

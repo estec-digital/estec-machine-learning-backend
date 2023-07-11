@@ -28,6 +28,7 @@ const serverlessConfiguration: AWS = {
     // Cloud provider's name and region
     name: 'aws',
     region: process.env.REGION as AWS['provider']['region'],
+    versionFunctions: false,
 
     // CloudFormation stage
     stage: '${opt:stage, "alpha"}',

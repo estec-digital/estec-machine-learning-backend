@@ -1,17 +1,26 @@
+import { SortOrder } from 'dynamoose/dist/General'
 import { CSensorData } from '~root/dynamodb/schema/SensorDataTable'
 
-export interface IQuerySensorData {
+export interface IRawDBGetData {
+  Date: CSensorData['Date']
+  Time: CSensorData['Time']
+}
+
+export interface IRawDBQueryData {
   partition: string
-  range: object
+  range?: object
+  sort?: SortOrder
+  limit?: number
 }
 
-export interface IGetData {
+export interface IAppDBGetData {
   Date: CSensorData['Date']
   Time: CSensorData['Time']
 }
 
-export interface IUpdatePrediction {
-  Date: CSensorData['Date']
-  Time: CSensorData['Time']
-  Prediction: CSensorData['Prediction']
+export interface IAppDBQueryData {
+  partition: string
+  range?: object
+  sort?: SortOrder
+  limit?: number
 }

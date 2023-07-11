@@ -46,6 +46,7 @@ class RestHandlerWithActionAndPayload<TActionName> {
     try {
       const actionName = lodash.get(this.event, 'body.action')
       const payload = lodash.get(this.event, 'body.payload')
+      console.log(JSON.stringify({ action: actionName, payload: payload }))
       const handler: (params) => any = lodash.get(this.actions, actionName) as unknown as () => {}
       if (!handler) {
         throw new Error('Invalid action!')

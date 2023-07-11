@@ -5,15 +5,36 @@ import * as Types from './types'
 
 class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   protected static setActions() {
-    this.restHandler.setAction('insert-raw-data', FunctionHandler.insertRawData, ['Date', 'Time'])
-    this.restHandler.setAction('query-sensor-data', FunctionHandler.querySensorData, ['partition', 'range'])
+    // RawDB
+    this.restHandler.setAction('raw_db__insert_data', FunctionHandler.rawDBInsertData, ['Date', 'Time'])
+    this.restHandler.setAction('raw_db__get_data', FunctionHandler.rawDBGetData, ['Date', 'Time'])
+    this.restHandler.setAction('raw_db__query_data', FunctionHandler.rawDBQueryData, ['partition'])
+
+    // AppDB
+    this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
+    this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['partition'])
   }
 
-  private static async insertRawData(params: IActionHandlerParams<CRawData>) {
-    return await DataService.insertRawData(params.bodyPayload)
+  // RawDB
+  private static async rawDBInsertData(params: IActionHandlerParams<CRawData>) {
+    return await DataService.rawDBInsertData(params.bodyPayload)
   }
-  private static async querySensorData(params: IActionHandlerParams<DataServiceTypes.IQuerySensorData>) {
-    return await DataService.querySensorData(params.bodyPayload)
+
+  private static async rawDBGetData(params: IActionHandlerParams<DataServiceTypes.IRawDBGetData>) {
+    return await DataService.rawDBGetData(params.bodyPayload)
+  }
+
+  private static async rawDBQueryData(params: IActionHandlerParams<DataServiceTypes.IRawDBQueryData>) {
+    return await DataService.rawDBQueryData(params.bodyPayload)
+  }
+
+  // AppDB
+  private static async appDBGetData(params: IActionHandlerParams<DataServiceTypes.IAppDBGetData>) {
+    return await DataService.appDBGetData(params.bodyPayload)
+  }
+
+  private static async appDBQueryData(params: IActionHandlerParams<DataServiceTypes.IAppDBQueryData>) {
+    return await DataService.appDBQueryData(params.bodyPayload)
   }
 }
 
