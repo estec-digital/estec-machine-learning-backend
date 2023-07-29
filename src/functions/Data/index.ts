@@ -1,5 +1,5 @@
+import { IRawData } from '~aws_resources/dynamodb/RawData'
 import { IActionHandlerParams, RestHandler } from '~core/rest-handler/RestHandler'
-import { CRawData } from '~root/dynamodb/schema/RawDataTable'
 import { DataService, Types as DataServiceTypes } from '~services/Data'
 import * as Types from './types'
 
@@ -16,7 +16,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   }
 
   // RawDB
-  private static async rawDBInsertData(params: IActionHandlerParams<CRawData>) {
+  private static async rawDBInsertData(params: IActionHandlerParams<IRawData>) {
     return await DataService.rawDBInsertData(params.bodyPayload)
   }
 

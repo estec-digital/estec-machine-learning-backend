@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
 import * as AWS from 'aws-sdk'
-import { WebSocketConnection } from '~root/dynamodb/schema/WebSocketConnectionTable'
+import { WebSocketConnection } from '~aws_resources/dynamodb/WebSocketConnection'
 import * as Types from './types'
 
 const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
@@ -10,7 +10,7 @@ const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
 
 export class WebSocketService {
   public static async connect(event: APIGatewayProxyEvent, context: Context) {
-    await WebSocketConnection.create({
+    await WebSocketConnection.model.create({
       ConnectionId: event.requestContext.connectionId,
       ConnectedAt: event.requestContext.connectedAt,
       Context: event.requestContext,
@@ -20,7 +20,7 @@ export class WebSocketService {
   }
 
   public static async disconnect(event: APIGatewayProxyEvent, context: Context) {
-    return await WebSocketConnection.delete(event.requestContext.connectionId)
+    return await WebSocketConnection.model.delete(event.requestContext.connectionId)
   }
 
   public static async default(event: APIGatewayProxyEvent, context: Context) {
@@ -42,7 +42,7 @@ export class WebSocketService {
               .postToConnection({ ConnectionId: params.connectionId, Data: JSON.stringify(data) })
               .promise()
           } catch (error) {
-            await WebSocketConnection.delete({ ConnectionId: params.connectionId })
+            await WebSocketConnection.model.delete({ ConnectionId: params.connectionId })
             if (error.statusCode === 410 || error.statusCode === 404) {
               console.log(`Connection id: "${params.connectionId}" is closed or not found.`)
             } else {
@@ -52,7 +52,7 @@ export class WebSocketService {
           return true
         }
         case 'POST_TO_ALL_CONNECTIONS': {
-          const connections = await WebSocketConnection.scan().exec()
+          const connections = await WebSocketConnection.model.scan().exec()
           const data = await params.data()
           console.log('Line47: ', JSON.stringify(data))
           for (const connection of connections) {
@@ -61,7 +61,7 @@ export class WebSocketService {
                 .postToConnection({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(data) })
                 .promise()
             } catch (error) {
-              await WebSocketConnection.delete({ ConnectionId: connection.ConnectionId })
+              await WebSocketConnection.model.delete({ ConnectionId: connection.ConnectionId })
               if (error.statusCode === 410 || error.statusCode === 404) {
                 console.log(`Connection id: "${connection.ConnectionId}" is closed or not found.`)
               } else {

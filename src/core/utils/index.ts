@@ -60,5 +60,9 @@ export function customWhereFullName(queryBuilder: SelectQueryBuilder<any>, entit
 }
 
 export function generateResourceName(name: string) {
+  return `${process.env.SERVICE}-${process.env.STAGE}-${name}`
+}
+
+export function generateServerlessResourceName(name: string) {
   return '${self:service}-${self:provider.stage}-' + name
 }

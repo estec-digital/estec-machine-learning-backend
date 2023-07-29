@@ -1,4 +1,4 @@
-import { CUser } from '~root/dynamodb/schema/UserTable'
+import { IUser } from '~aws_resources/dynamodb/User'
 
 export interface IRegister {
   username: string
@@ -19,8 +19,8 @@ export interface ILogin {
 
 export interface ILoginResponse {
   message: string
-  user: Partial<CUser>
+  user: Partial<IUser>
   token: string
 }
 
-export type TJwtAuthData = Pick<CUser, 'Username' | 'FirstName' | 'LastName' | 'Email'>
+export type TJwtAuthData = Pick<IUser, 'Username' | 'FirstName' | 'LastName' | 'Email'>

@@ -1,22 +1,22 @@
 import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
-import { CRawData, RawData } from '~root/dynamodb/schema/RawDataTable'
-import { CSensorData, SensorData } from '~root/dynamodb/schema/SensorDataTable'
+import { IRawData, RawData } from '~aws_resources/dynamodb/RawData'
+import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
 import * as Types from './types'
 
 export class DataService {
   // RawDB
-  public static async rawDBInsertData(rawData: CRawData): Promise<boolean> {
-    await RawData.create(rawData)
+  public static async rawDBInsertData(rawData: IRawData): Promise<boolean> {
+    await RawData.model.create(rawData)
     return true
   }
 
-  public static async rawDBGetData(params: Types.IRawDBGetData): Promise<CRawData> {
-    const data = await RawData.get({ Date: params.Date, Time: params.Time })
+  public static async rawDBGetData(params: Types.IRawDBGetData): Promise<IRawData> {
+    const data = await RawData.model.get({ Date: params.Date, Time: params.Time })
     return data
   }
 
-  public static async rawDBQueryData(params: Types.IRawDBQueryData): Promise<QueryResponse<CRawData>> {
+  public static async rawDBQueryData(params: Types.IRawDBQueryData): Promise<QueryResponse<IRawData>> {
     const queryParams = {
       Date: {
         eq: params.partition,
@@ -25,7 +25,7 @@ export class DataService {
     if (params.range) {
       queryParams['Time'] = params.range
     }
-    let query = RawData.query(queryParams)
+    let query = RawData.model.query(queryParams)
     if (params.sort) {
       query = query.sort(params.sort)
     }
@@ -37,12 +37,12 @@ export class DataService {
   }
 
   // AppDB
-  public static async appDBGetData(params: Types.IAppDBGetData): Promise<CSensorData> {
-    const data = await SensorData.get({ Date: params.Date, Time: params.Time })
+  public static async appDBGetData(params: Types.IAppDBGetData): Promise<ISensorData> {
+    const data = await SensorData.model.get({ Date: params.Date, Time: params.Time })
     return data
   }
 
-  public static async appDBQueryData(params: Types.IAppDBQueryData): Promise<QueryResponse<CSensorData>> {
+  public static async appDBQueryData(params: Types.IAppDBQueryData): Promise<QueryResponse<ISensorData>> {
     const queryParams = {
       Date: {
         eq: params.partition,
@@ -51,7 +51,7 @@ export class DataService {
     if (params.range) {
       queryParams['Time'] = params.range
     }
-    let query = SensorData.query(queryParams)
+    let query = SensorData.model.query(queryParams)
     if (params.sort) {
       query = query.sort(params.sort)
     }
@@ -62,9 +62,10 @@ export class DataService {
     return data
   }
 
-  public static async appDBQueryLastItemsOfSensorData(numberOfItems: number): Promise<CSensorData[]> {
+  public static async appDBQueryLastItemsOfSensorData(numberOfItems: number): Promise<ISensorData[]> {
     const now = dayjs()
-    const arrItems = await SensorData.query({ Date: { eq: now.format('YYYY-MM-DD') } })
+    const arrItems = await SensorData.model
+      .query({ Date: { eq: now.format('YYYY-MM-DD') } })
       .sort('descending')
       .limit(numberOfItems)
       .exec()

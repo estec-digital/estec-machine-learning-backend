@@ -5,40 +5,39 @@ const LambdaFunctionConfigs: AWS['functions'][any] = {
   handler: `${handlerPath(__dirname)}/index.main`,
   memorySize: 1024,
   timeout: 30,
-  events: [],
-}
-
-if (process.env.WEBSOCKET_CONNECTION_DYNAMODB_STREAM) {
-  LambdaFunctionConfigs.events.push({
-    stream: {
-      type: 'dynamodb',
-      batchSize: 3,
-      batchWindow: 3,
-      arn: process.env.WEBSOCKET_CONNECTION_DYNAMODB_STREAM,
+  events: [
+    {
+      stream: {
+        type: 'dynamodb',
+        batchSize: 1,
+        // batchWindow: 5,
+        startingPosition: 'LATEST',
+        arn: {
+          'Fn::GetAtt': ['WebSocketConnection', 'StreamArn'],
+        },
+      },
     },
-  })
-}
-
-if (process.env.WEBSOCKET_RAW_DATA_DYNAMODB_STREAM) {
-  LambdaFunctionConfigs.events.push({
-    stream: {
-      type: 'dynamodb',
-      batchSize: 3,
-      batchWindow: 3,
-      arn: process.env.WEBSOCKET_RAW_DATA_DYNAMODB_STREAM,
+    {
+      stream: {
+        type: 'dynamodb',
+        batchSize: 1,
+        startingPosition: 'LATEST',
+        arn: {
+          'Fn::GetAtt': ['RawData', 'StreamArn'],
+        },
+      },
     },
-  })
-}
-
-if (process.env.WEBSOCKET_SENSOR_DATA_DYNAMODB_STREAM) {
-  LambdaFunctionConfigs.events.push({
-    stream: {
-      type: 'dynamodb',
-      batchSize: 3,
-      batchWindow: 3,
-      arn: process.env.WEBSOCKET_SENSOR_DATA_DYNAMODB_STREAM,
+    {
+      stream: {
+        type: 'dynamodb',
+        batchSize: 1,
+        startingPosition: 'LATEST',
+        arn: {
+          'Fn::GetAtt': ['SensorData', 'StreamArn'],
+        },
+      },
     },
-  })
+  ],
 }
 
 export default LambdaFunctionConfigs

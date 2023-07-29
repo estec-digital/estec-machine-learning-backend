@@ -1,21 +1,21 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
-import { CUser, User } from '~root/dynamodb/schema/UserTable'
+import { IUser, User } from '~aws_resources/dynamodb/User'
 import * as Types from './types'
 
 export class AuthService {
   public static async register(params: Types.IRegister): Promise<Types.IRegisterResponse> {
-    const existingUser = await User.get(params.username)
+    const existingUser = await User.model.get(params.username)
 
-    if (existingUser instanceof User) {
+    if (existingUser) {
       throw new Error('User is already registered. Please login.')
     }
 
     const salt = bcrypt.genSaltSync(10)
     const hashedPassword = bcrypt.hashSync(params.password, salt)
 
-    await User.create({
+    await User.model.create({
       Username: params.username,
       EncryptedPassword: hashedPassword,
     })
@@ -35,11 +35,11 @@ export class AuthService {
       throw new Error('Auth system is unavailable now!')
     }
 
-    const existingUser = await User.get(params.username)
+    const existingUser = await User.model.get(params.username)
 
-    if (existingUser instanceof User) {
+    if (existingUser) {
       if (bcrypt.compareSync(params.password, existingUser.EncryptedPassword)) {
-        const authData: Types.TJwtAuthData = lodash.pick<CUser>(existingUser, ['Username', 'FirstName', 'LastName', 'Email']) as Types.TJwtAuthData
+        const authData: Types.TJwtAuthData = lodash.pick<IUser>(existingUser, ['Username', 'FirstName', 'LastName', 'Email']) as Types.TJwtAuthData
 
         return {
           message: 'Login successfully!',

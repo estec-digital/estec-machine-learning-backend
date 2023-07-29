@@ -1,7 +1,6 @@
 import type { AWS, AwsLogRetentionInDays } from '@serverless/typescript'
 import * as dotenv from 'dotenv'
 import { apiGatewayResources } from '~aws_resources/api-gateway'
-import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'
 
 dotenv.config()
 
@@ -15,6 +14,7 @@ import DataFunction from '~functions/Data/routes'
 // WebSocket
 import WebSocketFunction from '~functions/WebSocket/routes'
 // DynamoDB stream
+import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'
 import DynamoDBStream from '~functions/DynamoDBStream/routes'
 
 // const serviceName = 'estec-backend'
@@ -31,7 +31,7 @@ const serverlessConfiguration: AWS = {
     versionFunctions: false,
 
     // CloudFormation stage
-    stage: '${opt:stage, "alpha"}',
+    stage: process.env.STAGE ?? '${opt:stage, "alpha"}',
 
     // AWS Lambda configs
     runtime: 'nodejs16.x',
@@ -51,6 +51,7 @@ const serverlessConfiguration: AWS = {
 
     // Environment variables
     environment: {
+      SERVICE: '${self:service}',
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       // WEBSOCKET_ENDPOINT: '${self:provider.stage}-${self:service}-websockets',

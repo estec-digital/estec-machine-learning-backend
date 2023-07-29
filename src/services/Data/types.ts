@@ -1,9 +1,9 @@
 import { SortOrder } from 'dynamoose/dist/General'
-import { CSensorData } from '~root/dynamodb/schema/SensorDataTable'
+import { ISensorData } from '~aws_resources/dynamodb/SensorData'
 
 export interface IRawDBGetData {
-  Date: CSensorData['Date']
-  Time: CSensorData['Time']
+  Date: ISensorData['Date']
+  Time: ISensorData['Time']
 }
 
 export interface IRawDBQueryData {
@@ -14,8 +14,8 @@ export interface IRawDBQueryData {
 }
 
 export interface IAppDBGetData {
-  Date: CSensorData['Date']
-  Time: CSensorData['Time']
+  Date: ISensorData['Date']
+  Time: ISensorData['Time']
 }
 
 export interface IAppDBQueryData {
