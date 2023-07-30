@@ -7,15 +7,15 @@ export const main: DynamoDBStreamHandler = async (event, context) => {
     for (const record of event.Records) {
       // Process each record in the DynamoDB stream
       switch (record.eventSourceARN) {
-        case process.env.WEBSOCKET_CONNECTION_DYNAMODB_STREAM: {
+        case process.env['DYNAMODB_ARN__WebSocketConnection']: {
           await DynamoDBStreamService.handleConnectionStream(record)
           break
         }
-        case process.env.WEBSOCKET_RAW_DATA_DYNAMODB_STREAM: {
+        case process.env['DYNAMODB_ARN__RawData']: {
           await DynamoDBStreamService.handleRawDataStream(record)
           break
         }
-        case process.env.WEBSOCKET_SENSOR_DATA_DYNAMODB_STREAM: {
+        case process.env['DYNAMODB_ARN__SensorData']: {
           await DynamoDBStreamService.handleSensorDataStream(record)
           break
         }

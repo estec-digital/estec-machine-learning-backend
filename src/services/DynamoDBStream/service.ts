@@ -40,7 +40,7 @@ export class DynamoDBStreamService {
       // console.log(`[AppDB] Item(${item.Date} ${item.Time}) calling ML lambda fn to get prediction...`)
 
       const predictionData = await LambdaService.invokeFunction({
-        functionName: 'ximangBinhPhuoc',
+        functionName: process.env.LAMBDA__SENSOR_DATA_PREDICTION,
         payload: {
           SensorData: item.SensorData,
         },

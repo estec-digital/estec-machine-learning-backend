@@ -44,6 +44,10 @@ export class MEDynamoDBTable<TableInterface, EnumIndexes = any> {
     return generateResourceName(this.props.identifier)
   }
 
+  public get streamInfo() {
+    return this.props.stream
+  }
+
   private get dynamooseSchema() {
     const { schema, localSecondaryIndexes, globalSecondaryIndexes } = this.props
     const schemaDefinition = lodash.cloneDeep(schema.definition)
