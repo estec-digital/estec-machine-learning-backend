@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
 import { IRawData, RawData } from '~aws_resources/dynamodb/RawData'
 import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
+import { SensorDataFeedback } from '~aws_resources/dynamodb/SensorDataFeedback'
 import * as Types from './types'
 
 export class DataService {
@@ -70,5 +71,10 @@ export class DataService {
       .limit(numberOfItems)
       .exec()
     return arrItems.map((e) => e).reverse()
+  }
+
+  public static async addFeedback(feedback: Types.IAddFeedback): Promise<boolean> {
+    await SensorDataFeedback.model.create(feedback)
+    return true
   }
 }

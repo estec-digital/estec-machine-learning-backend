@@ -1,5 +1,6 @@
 import { SortOrder } from 'dynamoose/dist/General'
 import { ISensorData } from '~aws_resources/dynamodb/SensorData'
+import { ISensorDataFeedback } from '~aws_resources/dynamodb/SensorDataFeedback'
 
 export interface IRawDBGetData {
   Date: ISensorData['Date']
@@ -24,3 +25,5 @@ export interface IAppDBQueryData {
   sort?: SortOrder
   limit?: number
 }
+
+export type IAddFeedback = ISensorDataFeedback

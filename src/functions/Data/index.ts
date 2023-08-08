@@ -13,6 +13,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     // AppDB
     this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
     this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['partition'])
+    this.restHandler.setAction('app_db__add_feedback', FunctionHandler.addFeedback, ['Date', 'Time', 'SensorData', 'Prediction', 'Feedback'])
   }
 
   // RawDB
@@ -35,6 +36,10 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async appDBQueryData(params: IActionHandlerParams<DataServiceTypes.IAppDBQueryData>) {
     return await DataService.appDBQueryData(params.bodyPayload)
+  }
+
+  private static async addFeedback(params: IActionHandlerParams<DataServiceTypes.IAddFeedback>) {
+    return await DataService.addFeedback(params.bodyPayload)
   }
 }
 
