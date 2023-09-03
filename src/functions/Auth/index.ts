@@ -5,7 +5,7 @@ import * as Types from './types'
 class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   protected static setActions() {
     // Auth
-    this.restHandler.setAction('register', FunctionHandler.register, ['username', 'password'])
+    this.restHandler.setAction('register', FunctionHandler.register, ['username', 'password', 'factoryId'])
     this.restHandler.setAction('login', FunctionHandler.login, ['username', 'password'])
   }
 

@@ -3,6 +3,7 @@ import { IUser } from '~aws_resources/dynamodb/User'
 export interface IRegister {
   username: string
   password: string
+  factoryId: string
 }
 
 export interface IRegisterResponse {

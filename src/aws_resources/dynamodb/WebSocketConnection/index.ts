@@ -1,18 +1,25 @@
-import { MEDynamoDBTable } from '~core/dynamodb'
-import { MESchemaDefinition, MESchemaSettings } from '~core/dynamodb/types'
+import { DynamoDBTable } from '~core/dynamodb'
+import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
 export interface IWebSocketConnection {
-  ConnectionId: string
+  FactoryId: string // Partition key: F_aBc1D
+  ConnectionId: string // Sort key: KnNMTcZZyQ0CF2A=
   ConnectedAt: number
   Context: Object
 }
 
-export enum EWebSocketConnectionIndexes {}
+export enum EWebSocketConnectionIndexes {
+  GSI_ConnectionId = 'GSI_ConnectionId',
+}
 
-const schemaDefinition: MESchemaDefinition = {
-  ConnectionId: {
+const schemaDefinition: SchemaDefinition = {
+  FactoryId: {
     type: String,
     hashKey: true,
+  },
+  ConnectionId: {
+    type: String,
+    rangeKey: true,
   },
   ConnectedAt: {
     type: Number,
@@ -22,11 +29,11 @@ const schemaDefinition: MESchemaDefinition = {
   },
 }
 
-const schemaSettings: MESchemaSettings = {
+const schemaSettings: SchemaSettings = {
   saveUnknown: false,
 }
 
-export const WebSocketConnection = new MEDynamoDBTable<IWebSocketConnection, EWebSocketConnectionIndexes>({
+export const WebSocketConnection = new DynamoDBTable<IWebSocketConnection, EWebSocketConnectionIndexes>({
   identifier: 'WebSocketConnection',
   schema: {
     definition: schemaDefinition,
@@ -38,4 +45,13 @@ export const WebSocketConnection = new MEDynamoDBTable<IWebSocketConnection, EWe
   stream: {
     streamViewType: 'NEW_AND_OLD_IMAGES',
   },
+  globalSecondaryIndexes: [
+    {
+      indexName: EWebSocketConnectionIndexes.GSI_ConnectionId,
+      keySchema: [{ attributeName: 'ConnectionId', keyType: 'HASH' }],
+      projection: {
+        projectionType: 'ALL',
+      },
+    },
+  ],
 })

@@ -1,12 +1,12 @@
+import axios from 'axios'
 import dayjs from 'dayjs'
 import * as lodash from 'lodash'
-import { IRawData, RawData } from '~aws_resources/dynamodb/RawData'
+import { IRawSensorData, RawSensorData } from '~aws_resources/dynamodb/RawSensorData'
 import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
 import { IWebSocketConnection } from '~aws_resources/dynamodb/WebSocketConnection'
 import { IDynamoDBRecord } from '~core/dynamoose/types'
 import { ISensorDataStreamData } from '~functions/DynamoDBStream/types'
 import { DataService } from '~services/Data'
-import { LambdaService } from '~services/Lambda'
 import { WebSocketService } from '~services/WebSocket'
 
 export class DynamoDBStreamService {
@@ -39,15 +39,27 @@ export class DynamoDBStreamService {
     if (item.Prediction === undefined) {
       // console.log(`[AppDB] Item(${item.Date} ${item.Time}) calling ML lambda fn to get prediction...`)
 
-      const predictionData = await LambdaService.invokeFunction({
-        functionName: process.env.LAMBDA__SENSOR_DATA_PREDICTION,
-        payload: {
+      const predictionData = await axios.post(
+        process.env.URL__SENSOR_DATA_PREDICTION,
+        {
           SensorData: item.SensorData,
         },
-      })
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
 
-      if (predictionData) {
-        item.Prediction = predictionData
+      // const predictionData = await LambdaService.invokeFunction({
+      //   functionName: process.env.LAMBDA__SENSOR_DATA_PREDICTION,
+      //   payload: {
+      //     SensorData: item.SensorData,
+      //   },
+      // })
+
+      if (predictionData.data) {
+        item.Prediction = predictionData.data
       }
 
       await item.save()
@@ -67,9 +79,9 @@ export class DynamoDBStreamService {
     return
   }
 
-  public static async handleRawDataStream(record: IDynamoDBRecord<IRawData>) {
+  public static async handleRawDataStream(record: IDynamoDBRecord<IRawSensorData>) {
     const image = record.dynamodb.NewImage
-    const item = await RawData.model.get({ Date: record.dynamodb.Keys.Date.S, Time: record.dynamodb.Keys.Time.S })
+    const item = await RawSensorData.model.get({ Date: record.dynamodb.Keys.Date.S, Time: record.dynamodb.Keys.Time.S })
     if (!item) return
     if (item.note?.triggedFnProcessDataToAppDB === false) {
       item.note.triggedFnProcessDataToAppDB = true

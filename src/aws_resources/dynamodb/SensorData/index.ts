@@ -1,9 +1,11 @@
-import { MEDynamoDBTable } from '~core/dynamodb'
-import { MESchemaDefinition, MESchemaSettings } from '~core/dynamodb/types'
+import { DynamoDBTable } from '~core/dynamodb'
+import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
 export interface ISensorData {
+  FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
+  Time: string // Sort key: 19:35:18
   Date: string
-  Time: string
+  FactoryId: string // F_aBc1D
   SensorData: {
     GA01_Oxi?: number
     GA02_Oxi?: number
@@ -23,14 +25,22 @@ export interface ISensorData {
 
 export enum ESensorDataIndexes {}
 
-const schemaDefinition: MESchemaDefinition = {
-  Date: {
+const schemaDefinition: SchemaDefinition = {
+  FactoryId_Date: {
     type: String,
     hashKey: true,
   },
   Time: {
     type: String,
     rangeKey: true,
+  },
+  Date: {
+    type: String,
+    required: true,
+  },
+  FactoryId: {
+    type: String,
+    required: true,
   },
   SensorData: {
     type: Object,
@@ -78,14 +88,14 @@ const schemaDefinition: MESchemaDefinition = {
   },
 }
 
-const schemaSettings: MESchemaSettings = {
+const schemaSettings: SchemaSettings = {
   saveUnknown: ['Prediction.Status.**', 'Prediction.RecommendationActions.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
 }
 
-export const SensorData = new MEDynamoDBTable<ISensorData, ESensorDataIndexes>({
+export const SensorData = new DynamoDBTable<ISensorData, ESensorDataIndexes>({
   identifier: 'SensorData',
   schema: {
     definition: schemaDefinition,
@@ -96,5 +106,17 @@ export const SensorData = new MEDynamoDBTable<ISensorData, ESensorDataIndexes>({
   },
   stream: {
     streamViewType: 'NEW_AND_OLD_IMAGES',
+  },
+  middlewares: {
+    beforeSave(obj) {
+      if ([obj.FactoryId_Date, obj.Date, obj.Time, obj.FactoryId].every((val) => val !== undefined) === false) {
+        console.log('Missing data for SensorData: ', obj)
+        throw new Error('Missing data for SensorData: ' + JSON.stringify(obj))
+      }
+      if (obj.FactoryId_Date !== `${obj.FactoryId}::${obj.Date}`) {
+        console.log('Invalid key for SensorData: ', obj)
+        throw new Error('Invalid key for SensorData: ' + JSON.stringify(obj))
+      }
+    },
   },
 })

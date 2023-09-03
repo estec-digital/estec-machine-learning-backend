@@ -16,7 +16,7 @@
   "dependencies": {
     "@middy/core": "^2.5.3",
     "@middy/http-json-body-parser": "^2.5.3",
-    "axios": "^1.2.1",
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "csv-parser": "^3.0.0",
     "dayjs": "^1.11.5",

@@ -1,20 +1,27 @@
-import { MEDynamoDBTable } from '~core/dynamodb'
-import { MESchemaDefinition, MESchemaSettings } from '~core/dynamodb/types'
+import { DynamoDBTable } from '~core/dynamodb'
+import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
 export interface IUser {
-  Username: string
+  Username: string // Partition key
+  FactoryId: string // GSI: F_aBc1D
   EncryptedPassword: string
   FirstName: string
   LastName: string
   Email: string
 }
 
-export enum EUserIndexes {}
+export enum EUserIndexes {
+  GSI_FactoryId = 'GSI_FactoryId',
+}
 
-const schemaDefinition: MESchemaDefinition = {
+const schemaDefinition: SchemaDefinition = {
   Username: {
     type: String,
     hashKey: true,
+  },
+  // GSI
+  FactoryId: {
+    type: String,
   },
   EncryptedPassword: {
     type: String,
@@ -30,7 +37,7 @@ const schemaDefinition: MESchemaDefinition = {
   },
 }
 
-const schemaSettings: MESchemaSettings = {
+const schemaSettings: SchemaSettings = {
   saveUnknown: false,
   timestamps: {
     createdAt: ['CreatedAt'],
@@ -38,7 +45,7 @@ const schemaSettings: MESchemaSettings = {
   },
 }
 
-export const User = new MEDynamoDBTable<IUser, EUserIndexes>({
+export const User = new DynamoDBTable<IUser, EUserIndexes>({
   identifier: 'User',
   schema: {
     definition: schemaDefinition,
@@ -47,4 +54,13 @@ export const User = new MEDynamoDBTable<IUser, EUserIndexes>({
   billing: {
     mode: 'PAY_PER_REQUEST',
   },
+  globalSecondaryIndexes: [
+    {
+      indexName: EUserIndexes.GSI_FactoryId,
+      keySchema: [{ attributeName: 'FactoryId', keyType: 'HASH' }],
+      projection: {
+        projectionType: 'ALL',
+      },
+    },
+  ],
 })

@@ -1,23 +1,23 @@
 import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
-import { IRawData, RawData } from '~aws_resources/dynamodb/RawData'
+import { IRawSensorData, RawSensorData } from '~aws_resources/dynamodb/RawSensorData'
 import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
 import { SensorDataFeedback } from '~aws_resources/dynamodb/SensorDataFeedback'
 import * as Types from './types'
 
 export class DataService {
   // RawDB
-  public static async rawDBInsertData(rawData: IRawData): Promise<boolean> {
-    await RawData.model.create(rawData)
+  public static async rawDBInsertData(rawData: IRawSensorData): Promise<boolean> {
+    await RawSensorData.model.create(rawData)
     return true
   }
 
-  public static async rawDBGetData(params: Types.IRawDBGetData): Promise<IRawData> {
-    const data = await RawData.model.get({ Date: params.Date, Time: params.Time })
+  public static async rawDBGetData(params: Types.IRawDBGetData): Promise<IRawSensorData> {
+    const data = await RawSensorData.model.get({ Date: params.Date, Time: params.Time })
     return data
   }
 
-  public static async rawDBQueryData(params: Types.IRawDBQueryData): Promise<QueryResponse<IRawData>> {
+  public static async rawDBQueryData(params: Types.IRawDBQueryData): Promise<QueryResponse<IRawSensorData>> {
     const queryParams = {
       Date: {
         eq: params.partition,
@@ -26,7 +26,7 @@ export class DataService {
     if (params.range) {
       queryParams['Time'] = params.range
     }
-    let query = RawData.model.query(queryParams)
+    let query = RawSensorData.model.query(queryParams)
     if (params.sort) {
       query = query.sort(params.sort)
     }

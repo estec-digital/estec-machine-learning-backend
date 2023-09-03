@@ -1,3 +1,5 @@
+import { ISensorData } from '~aws_resources/dynamodb/SensorData'
+
 export interface IInitDataToDB {}
 
 export interface IInitDataToDBResponse {
@@ -24,4 +26,8 @@ export interface IFile_LabelDescription {
   Label: string
   Status: string
   Description: string
+}
+
+export interface IInsertSensorData {
+  items: ISensorData[]
 }
