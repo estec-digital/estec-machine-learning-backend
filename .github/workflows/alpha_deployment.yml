@@ -1,6 +1,8 @@
 name: (Alpha) - Deploy ESTEC backend
 
 on:
+  push:
+    branches: [alpha_test]
   pull_request:
     branches: [alpha_test]
 
