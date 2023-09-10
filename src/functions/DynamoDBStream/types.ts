@@ -1,4 +1,4 @@
-import { ISensorData } from '~aws_resources/dynamodb/SensorData'
+import { ISensorData } from '~aws_resources/dynamodb/tables'
 
 type TDataBaseAction = 'init-data-to-db'
 

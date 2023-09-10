@@ -1,9 +1,9 @@
 import * as dynamoose from 'dynamoose'
 import { IndexType } from 'dynamoose/dist/Schema'
 
-export type MESchemaDefinition = ConstructorParameters<typeof dynamoose.Schema>[0]
-export type MESchemaSettings = ConstructorParameters<typeof dynamoose.Schema>[1]
-export type MEIndexDefinition = {
+export type SchemaDefinition = ConstructorParameters<typeof dynamoose.Schema>[0]
+export type SchemaSettings = ConstructorParameters<typeof dynamoose.Schema>[1]
+export type IndexDefinition = {
   /**
    * The name of the index.
    * @default `${attribute}${type == "global" ? "GlobalIndex" : "LocalIndex"}`

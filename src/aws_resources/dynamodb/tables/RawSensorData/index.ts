@@ -1,9 +1,12 @@
-import { MEDynamoDBTable } from '~core/dynamodb'
-import { MESchemaDefinition, MESchemaSettings } from '~core/dynamodb/types'
+import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
+import { DynamoDBTable } from '~core/dynamodb'
+import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
-export interface IRawData {
-  Date: string // YYYY-DD-MM
-  Time: string // HH:mm:ss
+export interface IRawSensorData {
+  FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
+  Time: string // Sort key: 19:35:18
+  Date: string
+  FactoryId: string // F_aBc1D
   '4G1GA01XAC01_NO_AVG'?: number
   '4G1GA01XAC01_O2_AVG'?: number
   '4G1GA02XAC01_O2_AVG'?: number
@@ -18,16 +21,24 @@ export interface IRawData {
   }
 }
 
-export enum ERawDataIndexes {}
+export enum ERawSensorDataIndexes {}
 
-const schemaDefinition: MESchemaDefinition = {
-  Date: {
+const schemaDefinition: SchemaDefinition = {
+  FactoryId_Date: {
     type: String,
     hashKey: true,
   },
   Time: {
     type: String,
     rangeKey: true,
+  },
+  Date: {
+    type: String,
+    required: true,
+  },
+  FactoryId: {
+    type: String,
+    required: true,
   },
   '4G1GA01XAC01_NO_AVG': {
     type: Number,
@@ -66,14 +77,14 @@ const schemaDefinition: MESchemaDefinition = {
   },
 }
 
-const schemaSettings: MESchemaSettings = {
+const schemaSettings: SchemaSettings = {
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
 }
 
-export const RawData = new MEDynamoDBTable<IRawData, ERawDataIndexes>({
-  identifier: 'RawData',
+export const RawSensorData = new DynamoDBTable<IRawSensorData, ERawSensorDataIndexes>({
+  identifier: 'RawSensorData',
   schema: {
     definition: schemaDefinition,
     settings: schemaSettings,
@@ -83,5 +94,10 @@ export const RawData = new MEDynamoDBTable<IRawData, ERawDataIndexes>({
   },
   stream: {
     streamViewType: 'NEW_AND_OLD_IMAGES',
+  },
+  middlewares: {
+    beforeSave(obj) {
+      constraintChecking__SensorData('RawSensorData', obj)
+    },
   },
 })

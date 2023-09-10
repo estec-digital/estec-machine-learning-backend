@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
 import * as AWS from 'aws-sdk'
-import { WebSocketConnection } from '~aws_resources/dynamodb/WebSocketConnection'
+import { WebSocketConnection } from '~aws_resources/dynamodb/tables'
+import { TJwtAuthUserInfo } from '~services/Auth/types'
 import * as Types from './types'
 
 const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
@@ -10,17 +11,23 @@ const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
 
 export class WebSocketService {
   public static async connect(event: APIGatewayProxyEvent, context: Context) {
-    await WebSocketConnection.model.create({
-      ConnectionId: event.requestContext.connectionId,
-      ConnectedAt: event.requestContext.connectedAt,
-      Context: event.requestContext,
-    })
+    const authData = JSON.parse(event.requestContext?.authorizer?.authData ?? '{}') as TJwtAuthUserInfo
+    if (Object.keys(authData).length > 0) {
+      await WebSocketConnection.model.create({
+        ConnectionId: event.requestContext.connectionId,
+        FactoryId: authData.FactoryId,
+        ConnectedAt: event.requestContext.connectedAt,
+        Context: event.requestContext,
+      })
+    } else {
+      throw new Error('Unauthorized - No auth data!')
+    }
 
     return true
   }
 
   public static async disconnect(event: APIGatewayProxyEvent, context: Context) {
-    return await WebSocketConnection.model.delete(event.requestContext.connectionId)
+    return await WebSocketConnection.model.delete({ ConnectionId: event.requestContext.connectionId })
   }
 
   public static async default(event: APIGatewayProxyEvent, context: Context) {
@@ -37,6 +44,7 @@ export class WebSocketService {
       switch (params.type) {
         case 'POST_TO_SINGLE_CONNECTION': {
           const data = await params.data()
+          console.log({ POST_TO_SINGLE_CONNECTION: { connectionId: params.connectionId, data } })
           try {
             await WebSocketService.getAPIGatewayManagementApiInstance()
               .postToConnection({ ConnectionId: params.connectionId, Data: JSON.stringify(data) })
@@ -54,7 +62,6 @@ export class WebSocketService {
         case 'POST_TO_ALL_CONNECTIONS': {
           const connections = await WebSocketConnection.model.scan().exec()
           const data = await params.data()
-          console.log('Line47: ', JSON.stringify(data))
           for (const connection of connections) {
             try {
               await WebSocketService.getAPIGatewayManagementApiInstance()

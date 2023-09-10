@@ -1,5 +1,5 @@
 interface IPostDataGeneric {
-  data: () => Promise<object>
+  data: () => Promise<object> | object
 }
 interface IPostDataToAllConnections extends IPostDataGeneric {
   type: 'POST_TO_ALL_CONNECTIONS'

@@ -1,8 +1,9 @@
-import { IUser } from '~aws_resources/dynamodb/User'
+import { IUser } from '~aws_resources/dynamodb/tables'
 
 export interface IRegister {
   username: string
   password: string
+  factoryId: string
 }
 
 export interface IRegisterResponse {
@@ -19,8 +20,8 @@ export interface ILogin {
 
 export interface ILoginResponse {
   message: string
-  user: Partial<IUser>
+  user: TJwtAuthUserInfo
   token: string
 }
 
-export type TJwtAuthData = Pick<IUser, 'Username' | 'FirstName' | 'LastName' | 'Email'>
+export type TJwtAuthUserInfo = Omit<IUser, 'EncryptedPassword'>
