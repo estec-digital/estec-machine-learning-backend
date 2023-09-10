@@ -1,0 +1,36 @@
+name: (Alpha) - Deploy ESTEC backend
+
+on:
+  pull_request:
+    branches: [alpha_test]
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+
+    steps:
+      #
+      - name: Checkout latest commit (Alpha)
+        uses: actions/checkout@v2
+      #
+      - name: Setup Node.js environment (version ${{ matrix.node-version }})
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      #
+      - name: Install Dependencies
+        run: |
+          npm install -g yarn
+          npm install -g serverless
+          yarn
+      #
+      - name: Run test
+      run: |
+          cat .env.test
+          yarn test-unit
+
