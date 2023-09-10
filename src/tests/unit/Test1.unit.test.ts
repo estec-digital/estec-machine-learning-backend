@@ -3,6 +3,7 @@ import * as lodash from 'lodash'
 describe('[INTEGRATION] Test1', () => {
   beforeAll(async () => {
     console.log('Before test')
+    console.log('process.env.TEST_VALUE: ' + process.env.TEST_VALUE)
   })
 
   afterAll(async () => {
