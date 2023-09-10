@@ -13,28 +13,22 @@ jobs:
         node-version: [16.x, 18.x, 20.x]
 
     steps:
-      #
       - name: Checkout latest commit (Alpha)
         uses: actions/checkout@v2
-      #
       - name: Setup Node.js environment (version ${{ matrix.node-version }})
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
-      #
       - name: Install Dependencies
         run: |
           yarn
-      #
       - name: Make env file for testing
         uses: SpicyPizza/create-envfile@v2.0
         with:
           TEST_VALUE: '<This is a sample test value>'
-          #
           file_name: .env.test
           fail_on_empty: false
-      #
       - name: Run test
       run: |
           cat .env.test
