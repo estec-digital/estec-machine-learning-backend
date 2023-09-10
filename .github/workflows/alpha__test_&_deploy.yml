@@ -2,7 +2,7 @@ name: (Alpha) - Test & Deploy
 
 on:
   push:
-    branches: ['alpha*']
+    branches: [alpha]
 
 env:
   STAGE: 'alpha'
@@ -28,8 +28,8 @@ jobs:
           yarn
       - name: 'Create .env.test file'
         run: |
-          touch .test
-          echo TEST_VALUE="<This is a sample test value>" >> .test
+          touch .env.test
+          echo TEST_VALUE="<This is a sample test value>" >> .env.test
       - name: Run test
         run: |
           cat .env.test

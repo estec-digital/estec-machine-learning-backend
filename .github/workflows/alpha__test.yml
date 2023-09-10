@@ -3,7 +3,7 @@ name: (Alpha) - Test
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    branches: ['alpha*']
+    branches: [alpha]
 
 env:
   STAGE: 'alpha'
