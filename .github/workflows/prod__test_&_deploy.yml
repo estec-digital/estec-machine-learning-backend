@@ -58,8 +58,12 @@ jobs:
 
       - name: Run Serverless deploy
         env:
-          AUTH_LOGIN_JWT_TOKEN: ${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN}}
+          STAGE: ${{ env.STAGE }}
+          PROVIDER_NAME: ${{ env.PROVIDER_NAME }}
+          REGION: ${{ env.REGION }}
+          TZ: ${{ env.TZ }}
+          AUTH_LOGIN_JWT_TOKEN: ${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN }}
           AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN: '1 day'
-          URL__SENSOR_DATA_PREDICTION: ${{ secrets.PROD__URL__SENSOR_DATA_PREDICTION}}
+          URL__SENSOR_DATA_PREDICTION: ${{ secrets.PROD__URL__SENSOR_DATA_PREDICTION }}
         run: |
           serverless deploy --stage ${{ env.STAGE }} --force
