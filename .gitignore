@@ -15,3 +15,5 @@ jspm_packages
 src/tests_result
 
 .esbuild
+
+src/tests/_result
