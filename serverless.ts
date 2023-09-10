@@ -26,8 +26,8 @@ const serverlessConfiguration: AWS = {
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-dotenv-plugin'],
   provider: {
     // Cloud provider's name and region
-    name: 'aws',
-    region: process.env.REGION as AWS['provider']['region'],
+    name: (process.env.PROVIDER_NAME ?? 'aws') as AWS['provider']['name'],
+    region: (process.env.REGION ?? 'ap-southeast-1') as AWS['provider']['region'],
     versionFunctions: false,
 
     // CloudFormation stage

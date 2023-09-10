@@ -1,28 +1,28 @@
-name: (Alpha test) - Deploy ESTEC backend
+name: (Alpha) - Test
 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    branches: [alpha_test]
-  push:
-    types: [opened, reopened, synchronize]
-    branches: [alpha_test]
+    branches: ['alpha*']
+
+env:
+  STAGE: 'alpha'
+  PROVIDER_NAME: 'aws'
+  REGION: 'ap-southeast-1'
+  NODE_VERSION: '16.x'
+  TZ: 'Asia/Ho_Chi_Minh'
 
 jobs:
   Test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
-      - name: Checkout latest commit (Alpha)
-        uses: actions/checkout@v2
-      - name: Setup Node.js environment (version ${{ matrix.node-version }})
+      - name: Checkout latest commit of branch ${{ github.ref_name }}
+        uses: actions/checkout@v4
+      - name: Setup Node.js environment (version ${{ env.NODE_VERSION }})
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - name: Install Dependencies
         run: |
@@ -36,4 +36,4 @@ jobs:
       - name: Run test
         run: |
           cat .env.test
-          yarn test-unit
+          yarn test
