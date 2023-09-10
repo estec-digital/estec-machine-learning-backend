@@ -8,6 +8,7 @@ on:
     branches: [alpha_test]
 
 env:
+  STAGE: 'alpha'
   PROVIDER_NAME: 'aws'
   REGION: 'ap-southeast-1'
   NODE_VERSION: '16.x'
@@ -60,8 +61,6 @@ jobs:
 
       - name: Run Serverless deploy
         env:
-          REGION: eu-north-1
-          STAGE: 'alpha'
           AUTH_LOGIN_JWT_TOKEN: ${{ secrets.ALPHA__AUTH_LOGIN_JWT_TOKEN}}
           AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN: '1 day'
           URL__SENSOR_DATA_PREDICTION: ${{ secrets.ALPHA__URL__SENSOR_DATA_PREDICTION}}
