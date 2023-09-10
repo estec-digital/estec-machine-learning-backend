@@ -41,3 +41,7 @@ jobs:
           TEST_VALUE: '<This is a sample test value>'
           file_name: .env.test
           fail_on_empty: false
+      - name: Run test
+        run: |
+          cat .env.test
+          yarn test-unit
