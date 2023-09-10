@@ -8,7 +8,10 @@ on:
     branches: [alpha_test]
 
 env:
-  NODE_VERSION: 16.x
+  PROVIDER_NAME: 'aws'
+  REGION: 'ap-southeast-1'
+  NODE_VERSION: '16.x'
+  TZ: 'Asia/Ho_Chi_Minh'
 
 jobs:
   Test:
@@ -53,7 +56,13 @@ jobs:
       - name: Install Dependencies
         run: |
           yarn global add serverless
-          yarn
+
       - name: Run Serverless deploy
+        env:
+          REGION: eu-north-1
+          STAGE: 'alpha'
+          AUTH_LOGIN_JWT_TOKEN: ${{ secrets.ALPHA__AUTH_LOGIN_JWT_TOKEN}}
+          AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN: '1 day'
+          URL__SENSOR_DATA_PREDICTION: ${{ secrets.ALPHA__URL__SENSOR_DATA_PREDICTION}}
         run: |
           serverless deploy --stage alpha --force
