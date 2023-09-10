@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 'Checkout latest commit of branch $GITHUB_REF'
+      - name: Checkout latest commit of branch $GITHUB_REF
         uses: actions/checkout@v4
       - name: Setup Node.js environment (version ${{ env.NODE_VERSION }})
         uses: actions/setup-node@v3
