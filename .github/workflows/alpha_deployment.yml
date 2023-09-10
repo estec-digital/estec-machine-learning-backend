@@ -35,3 +35,9 @@ jobs:
       - name: Install Dependencies
         run: |
           yarn
+      - name: Make env file for testing
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          TEST_VALUE: '<This is a sample test value>'
+          file_name: .env.test
+          fail_on_empty: false
