@@ -30,7 +30,6 @@ jobs:
         run: |
           touch .test
           echo TEST_VALUE="<This is a sample test value>" >> .test
-          cat .env.test
       - name: Run test
         run: |
           cat .env.test
