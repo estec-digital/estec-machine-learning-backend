@@ -44,7 +44,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout latest commit (branch: ${GITHUB_REF##*/})
+      - name: Checkout latest commit of branch $GITHUB_REF
         uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
