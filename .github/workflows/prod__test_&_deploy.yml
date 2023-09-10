@@ -26,12 +26,10 @@ jobs:
       - name: Install Dependencies
         run: |
           yarn
-      - name: Make env file for testing
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_TEST_VALUE: '<This is a sample test value>'
-          file_name: .env.test
-          fail_on_empty: false
+      - name: 'Create .env.test file'
+        run: |
+          touch .env.test
+          echo TEST_VALUE="<This is a sample test value>" >> .env.test
       - name: Run test
         run: |
           cat .env.test
@@ -55,15 +53,17 @@ jobs:
         run: |
           yarn
           yarn global add serverless
-
+      - name: 'Create .env file'
+        run: |
+          touch .env
+          echo STAGE=${{ env.STAGE }} >> .env
+          echo PROVIDER_NAME=${{ env.PROVIDER_NAME }} >> .env
+          echo REGION=${{ env.REGION }} >> .env
+          echo TZ=${{ env.TZ }} >> .env
+          cat .env
+          echo AUTH_LOGIN_JWT_TOKEN=${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN }} >> .env
+          echo AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN=${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN }} >> .env
+          echo URL__SENSOR_DATA_PREDICTION=${{ secrets.PROD__URL__SENSOR_DATA_PREDICTION }} >> .env
       - name: Run Serverless deploy
-        env:
-          STAGE: ${{ env.STAGE }}
-          PROVIDER_NAME: ${{ env.PROVIDER_NAME }}
-          REGION: ${{ env.REGION }}
-          TZ: ${{ env.TZ }}
-          AUTH_LOGIN_JWT_TOKEN: ${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN }}
-          AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN: '1 day'
-          URL__SENSOR_DATA_PREDICTION: ${{ secrets.PROD__URL__SENSOR_DATA_PREDICTION }}
         run: |
           serverless deploy --stage ${{ env.STAGE }} --force
