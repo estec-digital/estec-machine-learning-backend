@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout latest commit (Alpha)
+      - name: Checkout latest commit (Alpha test)
         uses: actions/checkout@v4
       - name: Setup Node.js environment (version ${{ env.NODE_VERSION }})
         uses: actions/setup-node@v3
@@ -43,6 +43,8 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Checkout latest commit (Alpha test)
+        uses: actions/checkout@v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
