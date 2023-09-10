@@ -1,12 +1,17 @@
 import bcrypt from 'bcryptjs'
+import { Item } from 'dynamoose/dist/Item'
 import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
-import { IUser, User } from '~aws_resources/dynamodb/User'
+import { Factory, IUser, User } from '~aws_resources/dynamodb/tables'
 import * as Types from './types'
 
 export class AuthService {
   public static async register(params: Types.IRegister): Promise<Types.IRegisterResponse> {
-    const existingUser = await User.model.get(params.username)
+    const [existingFactory, existingUser] = await Promise.all([Factory.model.get({ FactoryId: params.factoryId }), User.model.get(params.username)])
+
+    if (!existingFactory) {
+      throw new Error('Factory is not exist')
+    }
 
     if (existingUser) {
       throw new Error('User is already registered. Please login.')
@@ -17,6 +22,7 @@ export class AuthService {
 
     await User.model.create({
       Username: params.username,
+      FactoryId: existingFactory.FactoryId,
       EncryptedPassword: hashedPassword,
     })
 
@@ -26,6 +32,12 @@ export class AuthService {
         Username: params.username,
       },
     }
+  }
+
+  public static generateAuthUserInfo(user: IUser & Item): Types.TJwtAuthUserInfo {
+    const _user = lodash.cloneDeep(user.toJSON()) as IUser
+    delete _user.EncryptedPassword
+    return _user
   }
 
   public static async login(params: Types.ILogin): Promise<Types.ILoginResponse> {
@@ -39,7 +51,7 @@ export class AuthService {
 
     if (existingUser) {
       if (bcrypt.compareSync(params.password, existingUser.EncryptedPassword)) {
-        const authData: Types.TJwtAuthData = lodash.pick<IUser>(existingUser, ['Username', 'FirstName', 'LastName', 'Email']) as Types.TJwtAuthData
+        const authData = AuthService.generateAuthUserInfo(existingUser)
 
         return {
           message: 'Login successfully!',

@@ -1,6 +1,6 @@
 import csv from 'csv-parser'
 import fs from 'fs'
-import { ISensorData } from '~aws_resources/dynamodb/SensorData'
+import { ISensorData, SensorData } from '~aws_resources/dynamodb/tables'
 import * as Types from './types'
 
 export class AdminService {
@@ -54,5 +54,10 @@ export class AdminService {
     return {
       message: 'OK',
     }
+  }
+
+  public static async insertSensorData(params: Types.IInsertSensorData) {
+    await SensorData.model.batchPut(params.items)
+    return true
   }
 }

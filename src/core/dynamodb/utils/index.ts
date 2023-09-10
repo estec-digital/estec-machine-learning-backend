@@ -1,4 +1,4 @@
-import { MEDynamoDBTable } from '..'
+import { DynamoDBTable } from '..'
 
 // https://dynamoosejs.com/guide/Condition
 export function parseOperatorValue(value: any): Record<string, any> {
@@ -37,7 +37,7 @@ export function parseOperatorValue(value: any): Record<string, any> {
   return output
 }
 
-export function generateDynamoDBServerlessResourcesInfo(dynamoDBTables: Record<string, InstanceType<typeof MEDynamoDBTable<any, any>>>) {
+export function generateDynamoDBServerlessResourcesInfo(dynamoDBTables: Record<string, InstanceType<typeof DynamoDBTable<any, any>>>) {
   return Object.entries(dynamoDBTables).reduce(
     (prev, [dynamoDBTableName, dynamoDBTable]) => ({
       ...prev,
@@ -47,7 +47,7 @@ export function generateDynamoDBServerlessResourcesInfo(dynamoDBTables: Record<s
   )
 }
 
-export function generateDynamoDBEnvironmentVariables(dynamoDBTables: Record<string, InstanceType<typeof MEDynamoDBTable<any, any>>>) {
+export function generateDynamoDBEnvironmentVariables(dynamoDBTables: Record<string, InstanceType<typeof DynamoDBTable<any, any>>>) {
   return Object.entries(dynamoDBTables).reduce((prev, [dynamoDBTableName, dynamoDBTable]) => {
     const newVars = { ...prev }
     if (dynamoDBTable.streamInfo) {

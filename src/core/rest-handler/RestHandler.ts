@@ -5,7 +5,7 @@ import { formatJSONErrorResponse, formatJSONSuccessResponse } from '~core/lambda
 import { middyfy } from '~core/lambda/lambda'
 import { filterAllRequiredKeysInObject } from '~core/utils'
 import { applyPolyfillsToSystem } from '~core/utils/polyfill'
-import { TJwtAuthData } from '~services/Auth/types'
+import { TJwtAuthUserInfo } from '~services/Auth/types'
 
 applyPolyfillsToSystem()
 
@@ -21,7 +21,7 @@ export interface IActionHandlerParams<TBodyPayload = any> {
   event: any
   context: any
   bodyPayload: TBodyPayload
-  authData: TJwtAuthData
+  authData: TJwtAuthUserInfo
 }
 
 class RestHandlerWithActionAndPayload<TActionName> {
@@ -63,7 +63,7 @@ class RestHandlerWithActionAndPayload<TActionName> {
         event: this.event,
         context: this.context,
         bodyPayload: this.event?.body?.payload ?? {},
-        authData: (strAuthData ? JSON.parse(strAuthData) : undefined) as TJwtAuthData,
+        authData: (strAuthData ? JSON.parse(strAuthData) : undefined) as TJwtAuthUserInfo,
       }
       const result = await handler(actionHandlerParams)
 

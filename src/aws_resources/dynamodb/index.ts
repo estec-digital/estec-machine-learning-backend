@@ -1,12 +1,8 @@
 import { AWS } from '@serverless/typescript'
 import { generateDynamoDBEnvironmentVariables, generateDynamoDBServerlessResourcesInfo } from '~core/dynamodb/utils'
-import { RawData } from './RawData'
-import { SensorData } from './SensorData'
-import { SensorDataFeedback } from './SensorDataFeedback'
-import { User } from './User'
-import { WebSocketConnection } from './WebSocketConnection'
+import { Factory, RawSensorData, SensorData, SensorDataFeedback, User, WebSocketConnection } from './tables'
 
-const dynamoDBTables = { RawData, SensorData, SensorDataFeedback, User, WebSocketConnection }
+const dynamoDBTables = { RawSensorData, SensorData, SensorDataFeedback, User, Factory, WebSocketConnection }
 
 export const dynamoDBResources: Omit<AWS['resources']['Resources'], 'Fn::Transform'> = generateDynamoDBServerlessResourcesInfo(dynamoDBTables)
 

@@ -66,3 +66,7 @@ export function generateResourceName(name: string) {
 export function generateServerlessResourceName(name: string) {
   return '${self:service}-${self:provider.stage}-' + name
 }
+
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

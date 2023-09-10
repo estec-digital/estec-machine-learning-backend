@@ -2,17 +2,17 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import * as dynamoose from 'dynamoose'
 import { Item } from 'dynamoose/dist/Item'
 import * as lodash from 'lodash'
-import { MEArrayElement } from '~core/types/helper'
+import { ArrayElement } from '~core/types/helper'
 import { generateResourceName, generateServerlessResourceName } from '~core/utils'
 import * as Types from './types'
 
-export class MEDynamoDBTable<TableInterface, EnumIndexes = any> {
+export class DynamoDBTable<TableInterface, EnumIndexes = any> {
   constructor(
     private props: {
       identifier: string
       schema: {
-        definition: Types.MESchemaDefinition
-        settings?: Types.MESchemaSettings
+        definition: Types.SchemaDefinition
+        settings?: Types.SchemaSettings
       }
       billing?: Types.IBillingPayPerRequests | Types.IBillingProvisioned
       stream?: Types.IStreamSpecification
@@ -48,20 +48,23 @@ export class MEDynamoDBTable<TableInterface, EnumIndexes = any> {
     return this.props.stream
   }
 
-  private get dynamooseSchema() {
+  public get dynamooseSchema() {
     const { schema, localSecondaryIndexes, globalSecondaryIndexes } = this.props
     const schemaDefinition = lodash.cloneDeep(schema.definition)
 
     if (Array.isArray(localSecondaryIndexes) && localSecondaryIndexes.length > 0) {
       for (const lsi of localSecondaryIndexes) {
         for (const keySchema of lsi.keySchema) {
-          if (keySchema.keyType === 'RANGE') {
-            const indexDefinition: Types.MEIndexDefinition = {
-              name: String(lsi.indexName),
-              type: 'local',
-              rangeKey: String(keySchema.attributeName),
+          switch (keySchema.keyType) {
+            case 'RANGE': {
+              const indexDefinition: Types.IndexDefinition = {
+                name: String(lsi.indexName),
+                type: 'local',
+                rangeKey: String(keySchema.attributeName),
+              }
+              schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+              break
             }
-            schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
           }
         }
       }
@@ -69,12 +72,24 @@ export class MEDynamoDBTable<TableInterface, EnumIndexes = any> {
     if (Array.isArray(globalSecondaryIndexes) && globalSecondaryIndexes.length > 0) {
       for (const gsi of globalSecondaryIndexes) {
         for (const keySchema of gsi.keySchema) {
-          if (keySchema.keyType === 'RANGE') {
-            const indexDefinition: Types.MEIndexDefinition = {
-              name: String(gsi.indexName),
-              type: 'global',
+          switch (keySchema.keyType) {
+            case 'HASH': {
+              const indexDefinition: Types.IndexDefinition = {
+                name: String(gsi.indexName),
+                type: 'global',
+              }
+              schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+              break
             }
-            schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+            case 'RANGE': {
+              const indexDefinition: Types.IndexDefinition = {
+                name: String(gsi.indexName),
+                type: 'global',
+                rangeKey: String(keySchema.attributeName),
+              }
+              schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+              break
+            }
           }
         }
       }
@@ -89,13 +104,13 @@ export class MEDynamoDBTable<TableInterface, EnumIndexes = any> {
     const keySchema: DynamoDB.KeySchemaElement[] = []
     const { billing, stream, localSecondaryIndexes, globalSecondaryIndexes } = this.props
 
-    const insertToAttributeDefinitions = (newDef: MEArrayElement<typeof attributeDefinitions>) => {
+    const insertToAttributeDefinitions = (newDef: ArrayElement<typeof attributeDefinitions>) => {
       if (attributeDefinitions.findIndex((def) => def.AttributeName === newDef.AttributeName) === -1) {
         attributeDefinitions.push(newDef)
       }
     }
 
-    const insertToKeySchema = (newKeySchema: MEArrayElement<typeof keySchema>) => {
+    const insertToKeySchema = (newKeySchema: ArrayElement<typeof keySchema>) => {
       if (keySchema.findIndex((keySchema) => keySchema.AttributeName === newKeySchema.AttributeName) === -1) {
         keySchema.push(newKeySchema)
       }

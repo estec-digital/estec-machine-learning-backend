@@ -1,11 +1,14 @@
 import { v4 as uuidv4 } from 'uuid'
-import { MEDynamoDBTable } from '~core/dynamodb'
-import { MESchemaDefinition, MESchemaSettings } from '~core/dynamodb/types'
+import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
+import { DynamoDBTable } from '~core/dynamodb'
+import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
 export interface ISensorDataFeedback {
+  FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
+  Hash: string // Sort key: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
   Date: string
-  Hash: string
-  Time: string
+  Time: string // LSI
+  FactoryId: string // F_aBc1D
   SensorData: {
     GA01_Oxi?: number
     GA02_Oxi?: number
@@ -35,10 +38,12 @@ export interface ISensorDataFeedback {
   }
 }
 
-export enum ESensorDataFeedbackIndexes {}
+export enum ESensorDataFeedbackIndexes {
+  LSI_Time = 'LSI_Time',
+}
 
-const schemaDefinition: MESchemaDefinition = {
-  Date: {
+const schemaDefinition: SchemaDefinition = {
+  FactoryId_Date: {
     type: String,
     hashKey: true,
   },
@@ -47,11 +52,18 @@ const schemaDefinition: MESchemaDefinition = {
     rangeKey: true,
     default: () => uuidv4(),
   },
+  Date: {
+    type: String,
+    required: true,
+  },
   Time: {
     type: String,
-    // hashKey: true,
+    required: true,
   },
-
+  FactoryId: {
+    type: String,
+    required: true,
+  },
   SensorData: {
     type: Object,
     schema: {
@@ -102,9 +114,7 @@ const schemaDefinition: MESchemaDefinition = {
       Status: {
         type: Object,
         schema: {
-          // IsGood: {
-          //   type: Boolean,
-          // }, // allow Boolean and null
+          // IsGood: Boolean | Null
           Suggestions: {
             type: Set,
             schema: [String],
@@ -117,9 +127,7 @@ const schemaDefinition: MESchemaDefinition = {
       RecommendationActions: {
         type: Object,
         schema: {
-          // IsGood: {
-          //   type: Boolean,
-          // }, // allow Boolean and null
+          // IsGood: Boolean | Null
           Suggestions: {
             type: Set,
             schema: [String],
@@ -133,14 +141,14 @@ const schemaDefinition: MESchemaDefinition = {
   },
 }
 
-const schemaSettings: MESchemaSettings = {
+const schemaSettings: SchemaSettings = {
   saveUnknown: ['Feedback.Status.*', 'Feedback.RecommendationActions.*'],
   timestamps: {
     createdAt: ['CreatedAt'],
   },
 }
 
-export const SensorDataFeedback = new MEDynamoDBTable<ISensorDataFeedback, ESensorDataFeedbackIndexes>({
+export const SensorDataFeedback = new DynamoDBTable<ISensorDataFeedback, ESensorDataFeedbackIndexes>({
   identifier: 'SensorDataFeedback',
   schema: {
     definition: schemaDefinition,
@@ -148,5 +156,22 @@ export const SensorDataFeedback = new MEDynamoDBTable<ISensorDataFeedback, ESens
   },
   billing: {
     mode: 'PAY_PER_REQUEST',
+  },
+  localSecondaryIndexes: [
+    {
+      indexName: ESensorDataFeedbackIndexes.LSI_Time,
+      keySchema: [
+        { attributeName: 'FactoryId_Date', keyType: 'HASH' },
+        { attributeName: 'Time', keyType: 'RANGE' },
+      ],
+      projection: {
+        projectionType: 'ALL',
+      },
+    },
+  ],
+  middlewares: {
+    beforeSave(obj) {
+      constraintChecking__SensorData('SensorDataFeedback', obj)
+    },
   },
 })

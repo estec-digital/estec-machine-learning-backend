@@ -1,3 +1,4 @@
+import { APIGatewayAuthorizerEvent } from 'aws-lambda'
 import jwt from 'jsonwebtoken'
 import { AuthService } from '~services/Auth'
 
@@ -15,18 +16,32 @@ interface IAuthEvent {
   }
 }
 
-exports.main = async (event: IAuthEvent, context: any, callback: (...params: any) => any) => {
-  const { authorizationToken } = event
+exports.main = async (event: APIGatewayAuthorizerEvent, context: any, callback: (...params: any) => any) => {
+  let token: undefined | string = undefined
 
-  let token = authorizationToken
+  console.log({ event, context })
 
-  try {
-    const jsonLoginCredential = JSON.parse(authorizationToken)
-    if (jsonLoginCredential.username && jsonLoginCredential.password) {
-      const authResult = await AuthService.login(jsonLoginCredential)
-      token = authResult.token
+  switch (event.type) {
+    case 'TOKEN': {
+      token = event.authorizationToken
+      try {
+        const jsonLoginCredential = JSON.parse(event.authorizationToken)
+        if (jsonLoginCredential.username && jsonLoginCredential.password) {
+          const authResult = await AuthService.login(jsonLoginCredential)
+          token = authResult.token
+        }
+      } catch {}
+      break
     }
-  } catch {}
+    case 'REQUEST': {
+      token = event.queryStringParameters.authorization
+      break
+    }
+  }
+
+  console.log({ token })
+
+  if (!token) throw new Error('Empty token')
 
   try {
     const userInfo = jwt.verify(token, process.env.AUTH_LOGIN_JWT_TOKEN)
@@ -49,7 +64,7 @@ exports.main = async (event: IAuthEvent, context: any, callback: (...params: any
     }
     callback(null, IAMPolicy)
   } catch (error) {
-    // console.log('Auth failed!')
+    console.log({ AuthError: error })
     callback('Unauthorized')
   }
 }

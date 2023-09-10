@@ -23,7 +23,7 @@ const LambdaFunctionConfigs: AWS['functions'][any] = {
         batchSize: 1,
         startingPosition: 'LATEST',
         arn: {
-          'Fn::GetAtt': ['RawData', 'StreamArn'],
+          'Fn::GetAtt': ['RawSensorData', 'StreamArn'],
         },
       },
     },
