@@ -1,27 +1,28 @@
-name: (Prod) - Deploy ESTEC backend
+name: (Prod) - Test
 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    branches: [prod]
-  push:
-    branches: [prod]
+    branches: ['prod*']
+
+env:
+  STAGE: 'prod'
+  PROVIDER_NAME: 'aws'
+  REGION: 'ap-southeast-1'
+  NODE_VERSION: '16.x'
+  TZ: 'Asia/Ho_Chi_Minh'
 
 jobs:
   Test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
-      - name: Checkout latest commit (Prod)
-        uses: actions/checkout@v2
-      - name: Setup Node.js environment (version 16.x)
+      - name: Checkout latest commit (branch: ${GITHUB_REF##*/})
+        uses: actions/checkout@v4
+      - name: Setup Node.js environment (version ${{ env.NODE_VERSION }})
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - name: Install Dependencies
         run: |
@@ -35,4 +36,4 @@ jobs:
       - name: Run test
         run: |
           cat .env.test
-          yarn test-unit
+          yarn test
