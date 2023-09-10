@@ -1,6 +1,6 @@
 import * as lodash from 'lodash'
 
-describe('[UNIT] Test1', () => {
+describe('[INTEGRATION] Test1', () => {
   beforeAll(async () => {
     console.log('Before test')
   })
@@ -9,7 +9,7 @@ describe('[UNIT] Test1', () => {
     console.log('After test')
   })
 
-  test('Test 1 - Unit', async () => {
+  test('Test 1 - Integration', async () => {
     const output = 1
     const expectedOutput = 1
 

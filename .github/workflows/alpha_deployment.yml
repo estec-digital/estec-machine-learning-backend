@@ -1,9 +1,9 @@
 name: (Alpha) - Deploy ESTEC backend
 
 on:
-  push:
-    branches: ['alpha_test']
   pull_request:
+    branches: ['alpha_test']
+  push:
     branches: ['alpha_test']
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
       - name: Make env file for testing
         uses: SpicyPizza/create-envfile@v2.0
         with:
-          TEST_VALUE: '<This is a sample test value>'
+          envkey_TEST_VALUE: '<This is a sample test value>'
           file_name: .env.test
           fail_on_empty: false
       - name: Run test
