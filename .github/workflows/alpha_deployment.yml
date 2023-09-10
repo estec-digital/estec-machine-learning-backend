@@ -2,8 +2,10 @@ name: (Alpha) - Deploy ESTEC backend
 
 on:
   pull_request:
+    types: ['opened', 'reopened', 'synchronize']
     branches: ['alpha_test']
   push:
+    types: ['opened', 'reopened', 'synchronize']
     branches: ['alpha_test']
 
 jobs:
