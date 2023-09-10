@@ -1,39 +1,38 @@
+import { DynamoDB } from 'aws-sdk'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import * as lodash from 'lodash'
-import { IRawSensorData, RawSensorData } from '~aws_resources/dynamodb/RawSensorData'
-import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
-import { IWebSocketConnection } from '~aws_resources/dynamodb/WebSocketConnection'
+import { IRawSensorData, ISensorData, RawSensorData, SensorData } from '~aws_resources/dynamodb/tables/'
+import { EWebSocketConnectionIndexes, IWebSocketConnection, WebSocketConnection } from '~aws_resources/dynamodb/tables/WebSocketConnection'
+import { executeConcurrently } from '~core/dynamoose/model'
 import { IDynamoDBRecord } from '~core/dynamoose/types'
 import { ISensorDataStreamData } from '~functions/DynamoDBStream/types'
 import { DataService } from '~services/Data'
 import { WebSocketService } from '~services/WebSocket'
 
 export class DynamoDBStreamService {
-  public static async handleConnectionStream(record: IDynamoDBRecord<IWebSocketConnection>) {
-    if (record.eventName === 'INSERT') {
-      const connectionId = record.dynamodb.Keys?.ConnectionId?.S
-      if (connectionId) {
-        await WebSocketService.postData({
-          type: 'POST_TO_SINGLE_CONNECTION',
-          connectionId,
-          data: async (): Promise<ISensorDataStreamData> => ({
-            type: 'SENSOR_DATA__LAST_ITEMS',
-            data: await DataService.appDBQueryLastItemsOfSensorData(60),
-          }),
-        })
-      }
+  public static async handleConnectionInsertionStream(record: IDynamoDBRecord<IWebSocketConnection>) {
+    const newWSConnectionItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IWebSocketConnection
+    const connectionId = newWSConnectionItem.ConnectionId
+    if (connectionId) {
+      await WebSocketService.postData({
+        type: 'POST_TO_SINGLE_CONNECTION',
+        connectionId,
+        data: async (): Promise<ISensorDataStreamData> => ({
+          type: 'SENSOR_DATA__LAST_ITEMS',
+          data: await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: 60 }),
+        }),
+      })
     }
   }
 
   public static async handleSensorDataStream(record: IDynamoDBRecord<ISensorData>) {
-    const date = record.dynamodb.Keys.Date.S
-    const time = record.dynamodb.Keys.Time.S
-    const item = await SensorData.model.get({ Date: date, Time: time })
+    const newSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as ISensorData
 
-    if (!(date && time && item)) return
+    const item = await SensorData.model.get({ FactoryId_Date: newSensorDataItem.FactoryId_Date, Time: newSensorDataItem.Time })
 
-    const timeOfSensorData = dayjs(`${date} ${time}`, 'YYYY-MM-DD HH:mm:ss')
+    if (!item) return
+
+    const timeOfSensorData = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
     const now = dayjs()
 
     if (item.Prediction === undefined) {
@@ -67,21 +66,41 @@ export class DynamoDBStreamService {
       // console.log(`[AppDB] Item(${item.Date} ${item.Time}) got prediction successfully.`)
     } else {
       if (timeOfSensorData.isValid() && Math.abs(now.diff(timeOfSensorData, 'second')) <= 60 * 15) {
-        await WebSocketService.postData({
-          type: 'POST_TO_ALL_CONNECTIONS',
-          data: async (): Promise<ISensorDataStreamData> => ({
-            type: 'SENSOR_DATA__LAST_ITEMS',
-            data: await DataService.appDBQueryLastItemsOfSensorData(60),
-          }),
-        })
+        const allActiveWSConnections = await WebSocketConnection.model.query({ FactoryId: item.FactoryId }).using(EWebSocketConnectionIndexes.GSI_FactoryId).exec()
+
+        const mapOfWSConnectionsByFactoryId: { [factoryId: string]: IWebSocketConnection[] } = allActiveWSConnections.reduce(
+          (prev, current) => ({ [current.FactoryId]: [...(prev[current.FactoryId] ?? []), current] }),
+          {},
+        )
+
+        for (const [factoryId, wsConnections] of Object.entries(mapOfWSConnectionsByFactoryId)) {
+          if (wsConnections.length > 0) {
+            await executeConcurrently(wsConnections, 10, async (connections) => {
+              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 60 })
+              await Promise.all(
+                connections.map((connection) =>
+                  WebSocketService.postData({
+                    connectionId: connection.ConnectionId,
+                    type: 'POST_TO_SINGLE_CONNECTION',
+                    data: (): ISensorDataStreamData => ({
+                      type: 'SENSOR_DATA__LAST_ITEMS',
+                      data: data,
+                    }),
+                  }),
+                ),
+              )
+            })
+          }
+        }
       }
     }
     return
   }
 
-  public static async handleRawDataStream(record: IDynamoDBRecord<IRawSensorData>) {
-    const image = record.dynamodb.NewImage
-    const item = await RawSensorData.model.get({ Date: record.dynamodb.Keys.Date.S, Time: record.dynamodb.Keys.Time.S })
+  public static async handleRawSensorDataStream(record: IDynamoDBRecord<IRawSensorData>) {
+    const newRawSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IRawSensorData
+
+    const item = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
     if (!item) return
     if (item.note?.triggedFnProcessDataToAppDB === false) {
       item.note.triggedFnProcessDataToAppDB = true
@@ -89,17 +108,19 @@ export class DynamoDBStreamService {
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
 
       const sensorData: Partial<ISensorData> = {
-        Date: image.Date.S,
-        Time: image.Time.S,
+        FactoryId_Date: newRawSensorDataItem.FactoryId_Date,
+        Date: newRawSensorDataItem.Date,
+        Time: newRawSensorDataItem.Time,
+        FactoryId: newRawSensorDataItem.FactoryId,
         SensorData: {
-          GA01_Oxi: lodash.toNumber(image['4G1GA01XAC01_O2_AVG']?.N),
-          GA02_Oxi: lodash.toNumber(image['4G1GA02XAC01_O2_AVG']?.N),
-          GA03_Oxi: lodash.toNumber(image['4G1GA03XAC01_O2_AVG']?.N),
-          GA04_Oxi: lodash.toNumber(image['4G1GA04XAC01_O2_AVG']?.N),
-          KilnDriAmp: lodash.toNumber(image['4K1KP01DRV01_M2001_EI_AVG']?.N),
-          KilnInletTemp: lodash.toNumber(image['4G1KJ01JST00_T8401_AVG']?.N),
-          Nox: lodash.toNumber(image['4G1GA01XAC01_NO_AVG']?.N),
-          Pyrometer: lodash.toNumber(image['4K1KP01KHE01_B8701_AVG']?.N),
+          GA01_Oxi: newRawSensorDataItem['4G1GA01XAC01_O2_AV'],
+          GA02_Oxi: newRawSensorDataItem['4G1GA02XAC01_O2_AVG'],
+          GA03_Oxi: newRawSensorDataItem['4G1GA03XAC01_O2_AVG'],
+          GA04_Oxi: newRawSensorDataItem['4G1GA04XAC01_O2_AVG'],
+          KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
+          KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
+          Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
+          Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
         },
       }
 

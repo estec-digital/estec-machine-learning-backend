@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs'
+import { Item } from 'dynamoose/dist/Item'
 import jwt from 'jsonwebtoken'
 import * as lodash from 'lodash'
-import { Factory } from '~aws_resources/dynamodb/Factory'
-import { IUser, User } from '~aws_resources/dynamodb/User'
+import { Factory, IUser, User } from '~aws_resources/dynamodb/tables'
 import * as Types from './types'
 
 export class AuthService {
@@ -34,6 +34,12 @@ export class AuthService {
     }
   }
 
+  public static generateAuthUserInfo(user: IUser & Item): Types.TJwtAuthUserInfo {
+    const _user = lodash.cloneDeep(user.toJSON()) as IUser
+    delete _user.EncryptedPassword
+    return _user
+  }
+
   public static async login(params: Types.ILogin): Promise<Types.ILoginResponse> {
     const AUTH_LOGIN_JWT_TOKEN = process.env.AUTH_LOGIN_JWT_TOKEN
     const AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN = process.env.AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN
@@ -45,7 +51,7 @@ export class AuthService {
 
     if (existingUser) {
       if (bcrypt.compareSync(params.password, existingUser.EncryptedPassword)) {
-        const authData: Types.TJwtAuthData = lodash.pick<IUser>(existingUser, ['Username', 'FirstName', 'LastName', 'Email']) as Types.TJwtAuthData
+        const authData = AuthService.generateAuthUserInfo(existingUser)
 
         return {
           message: 'Login successfully!',

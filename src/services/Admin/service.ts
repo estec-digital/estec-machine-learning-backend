@@ -1,6 +1,6 @@
 import csv from 'csv-parser'
 import fs from 'fs'
-import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
+import { ISensorData, SensorData } from '~aws_resources/dynamodb/tables'
 import * as Types from './types'
 
 export class AdminService {

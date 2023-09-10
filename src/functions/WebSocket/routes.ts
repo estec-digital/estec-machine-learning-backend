@@ -6,9 +6,9 @@ const LambdaFunctionConfigs: AWS['functions'][any] = {
   memorySize: 1024,
   timeout: 30,
   events: [
-    { websocket: { route: '$connect' } },
+    { websocket: { route: '$connect', authorizer: { name: 'AuthTokenValidation', identitySource: 'route.request.querystring.authorization' } } },
     { websocket: { route: '$disconnect' } },
-    { websocket: { route: '$default' } }
+    { websocket: { route: '$default' } },
   ],
 }
 

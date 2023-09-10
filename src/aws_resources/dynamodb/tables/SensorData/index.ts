@@ -1,3 +1,4 @@
+import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
@@ -109,14 +110,7 @@ export const SensorData = new DynamoDBTable<ISensorData, ESensorDataIndexes>({
   },
   middlewares: {
     beforeSave(obj) {
-      if ([obj.FactoryId_Date, obj.Date, obj.Time, obj.FactoryId].every((val) => val !== undefined) === false) {
-        console.log('Missing data for SensorData: ', obj)
-        throw new Error('Missing data for SensorData: ' + JSON.stringify(obj))
-      }
-      if (obj.FactoryId_Date !== `${obj.FactoryId}::${obj.Date}`) {
-        console.log('Invalid key for SensorData: ', obj)
-        throw new Error('Invalid key for SensorData: ' + JSON.stringify(obj))
-      }
+      constraintChecking__SensorData('SensorData', obj)
     },
   },
 })

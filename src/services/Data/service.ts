@@ -1,80 +1,82 @@
 import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
-import { IRawSensorData, RawSensorData } from '~aws_resources/dynamodb/RawSensorData'
-import { ISensorData, SensorData } from '~aws_resources/dynamodb/SensorData'
-import { SensorDataFeedback } from '~aws_resources/dynamodb/SensorDataFeedback'
+import { getPartitionKey_SensorData } from '~aws_resources/dynamodb/middlewares'
+import { IRawSensorData, ISensorData, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { IActionHandlerParams } from '~core/rest-handler/RestHandler'
 import * as Types from './types'
 
 export class DataService {
   // RawDB
-  public static async rawDBInsertData(rawData: IRawSensorData): Promise<boolean> {
-    await RawSensorData.model.create(rawData)
+  public static async rawDBInsertData(params: IActionHandlerParams<IRawSensorData>): Promise<boolean> {
+    await RawSensorData.model.create({ ...params.bodyPayload, FactoryId: params.authData.FactoryId })
     return true
   }
 
-  public static async rawDBGetData(params: Types.IRawDBGetData): Promise<IRawSensorData> {
-    const data = await RawSensorData.model.get({ Date: params.Date, Time: params.Time })
+  public static async rawDBGetData(params: IActionHandlerParams<Types.IRawDBGetData>): Promise<IRawSensorData> {
+    const data = await RawSensorData.model.get({
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+      Time: params.bodyPayload.Time,
+    })
     return data
   }
 
-  public static async rawDBQueryData(params: Types.IRawDBQueryData): Promise<QueryResponse<IRawSensorData>> {
+  public static async rawDBQueryData(params: IActionHandlerParams<Types.IRawDBQueryData>): Promise<QueryResponse<IRawSensorData>> {
     const queryParams = {
-      Date: {
-        eq: params.partition,
-      },
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
     }
-    if (params.range) {
-      queryParams['Time'] = params.range
+    if (params.bodyPayload.Time) {
+      queryParams['Time'] = params.bodyPayload.Time
     }
     let query = RawSensorData.model.query(queryParams)
-    if (params.sort) {
-      query = query.sort(params.sort)
+    if (params.bodyPayload.sort) {
+      query = query.sort(params.bodyPayload.sort)
     }
-    if (params.limit) {
-      query = query.limit(params.limit)
+    if (params.bodyPayload.limit) {
+      query = query.limit(params.bodyPayload.limit)
     }
     const data = await query.exec()
     return data
   }
 
   // AppDB
-  public static async appDBGetData(params: Types.IAppDBGetData): Promise<ISensorData> {
-    const data = await SensorData.model.get({ Date: params.Date, Time: params.Time })
+  public static async appDBGetData(params: IActionHandlerParams<Types.IAppDBGetData>): Promise<ISensorData> {
+    const data = await SensorData.model.get({
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+      Time: params.bodyPayload.Time,
+    })
     return data
   }
 
-  public static async appDBQueryData(params: Types.IAppDBQueryData): Promise<QueryResponse<ISensorData>> {
+  public static async appDBQueryData(params: IActionHandlerParams<Types.IAppDBQueryData>): Promise<QueryResponse<ISensorData>> {
     const queryParams = {
-      Date: {
-        eq: params.partition,
-      },
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
     }
-    if (params.range) {
-      queryParams['Time'] = params.range
+    if (params.bodyPayload.Time) {
+      queryParams['Time'] = params.bodyPayload.Time
     }
     let query = SensorData.model.query(queryParams)
-    if (params.sort) {
-      query = query.sort(params.sort)
+    if (params.bodyPayload.sort) {
+      query = query.sort(params.bodyPayload.sort)
     }
-    if (params.limit) {
-      query = query.limit(params.limit)
+    if (params.bodyPayload.limit) {
+      query = query.limit(params.bodyPayload.limit)
     }
     const data = await query.exec()
     return data
   }
 
-  public static async appDBQueryLastItemsOfSensorData(numberOfItems: number): Promise<ISensorData[]> {
+  public static async appDBQueryLastItemsOfSensorData(params: { numberOfItems: number; factoryId: string }): Promise<ISensorData[]> {
     const now = dayjs()
     const arrItems = await SensorData.model
-      .query({ Date: { eq: now.format('YYYY-MM-DD') } })
+      .query({ FactoryId_Date: getPartitionKey_SensorData({ Date: now.format('YYYY-MM-DD'), FactoryId: params.factoryId }) })
       .sort('descending')
-      .limit(numberOfItems)
+      .limit(params.numberOfItems)
       .exec()
     return arrItems.map((e) => e).reverse()
   }
 
-  public static async addFeedback(feedback: Types.IAddFeedback): Promise<boolean> {
-    await SensorDataFeedback.model.create(feedback)
+  public static async addFeedback(params: IActionHandlerParams<Types.IAddFeedback>): Promise<boolean> {
+    await SensorDataFeedback.model.create({ ...params.bodyPayload, FactoryId: params.authData.FactoryId })
     return true
   }
 }

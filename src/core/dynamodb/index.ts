@@ -48,20 +48,23 @@ export class DynamoDBTable<TableInterface, EnumIndexes = any> {
     return this.props.stream
   }
 
-  private get dynamooseSchema() {
+  public get dynamooseSchema() {
     const { schema, localSecondaryIndexes, globalSecondaryIndexes } = this.props
     const schemaDefinition = lodash.cloneDeep(schema.definition)
 
     if (Array.isArray(localSecondaryIndexes) && localSecondaryIndexes.length > 0) {
       for (const lsi of localSecondaryIndexes) {
         for (const keySchema of lsi.keySchema) {
-          if (keySchema.keyType === 'RANGE') {
-            const indexDefinition: Types.IndexDefinition = {
-              name: String(lsi.indexName),
-              type: 'local',
-              rangeKey: String(keySchema.attributeName),
+          switch (keySchema.keyType) {
+            case 'RANGE': {
+              const indexDefinition: Types.IndexDefinition = {
+                name: String(lsi.indexName),
+                type: 'local',
+                rangeKey: String(keySchema.attributeName),
+              }
+              schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+              break
             }
-            schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
           }
         }
       }
@@ -69,12 +72,24 @@ export class DynamoDBTable<TableInterface, EnumIndexes = any> {
     if (Array.isArray(globalSecondaryIndexes) && globalSecondaryIndexes.length > 0) {
       for (const gsi of globalSecondaryIndexes) {
         for (const keySchema of gsi.keySchema) {
-          if (keySchema.keyType === 'RANGE') {
-            const indexDefinition: Types.IndexDefinition = {
-              name: String(gsi.indexName),
-              type: 'global',
+          switch (keySchema.keyType) {
+            case 'HASH': {
+              const indexDefinition: Types.IndexDefinition = {
+                name: String(gsi.indexName),
+                type: 'global',
+              }
+              schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+              break
             }
-            schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+            case 'RANGE': {
+              const indexDefinition: Types.IndexDefinition = {
+                name: String(gsi.indexName),
+                type: 'global',
+                rangeKey: String(keySchema.attributeName),
+              }
+              schemaDefinition[keySchema.attributeName]['index'] = indexDefinition
+              break
+            }
           }
         }
       }

@@ -2,24 +2,23 @@ import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
 export interface IWebSocketConnection {
-  FactoryId: string // Partition key: F_aBc1D
-  ConnectionId: string // Sort key: KnNMTcZZyQ0CF2A=
+  ConnectionId: string // Partition key: KnNMTcZZyQ0CF2A=
+  FactoryId: string
   ConnectedAt: number
   Context: Object
 }
 
 export enum EWebSocketConnectionIndexes {
-  GSI_ConnectionId = 'GSI_ConnectionId',
+  GSI_FactoryId = 'GSI_FactoryId',
 }
 
 const schemaDefinition: SchemaDefinition = {
-  FactoryId: {
+  ConnectionId: {
     type: String,
     hashKey: true,
   },
-  ConnectionId: {
+  FactoryId: {
     type: String,
-    rangeKey: true,
   },
   ConnectedAt: {
     type: Number,
@@ -47,8 +46,8 @@ export const WebSocketConnection = new DynamoDBTable<IWebSocketConnection, EWebS
   },
   globalSecondaryIndexes: [
     {
-      indexName: EWebSocketConnectionIndexes.GSI_ConnectionId,
-      keySchema: [{ attributeName: 'ConnectionId', keyType: 'HASH' }],
+      indexName: EWebSocketConnectionIndexes.GSI_FactoryId,
+      keySchema: [{ attributeName: 'FactoryId', keyType: 'HASH' }],
       projection: {
         projectionType: 'ALL',
       },
