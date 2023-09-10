@@ -29,7 +29,7 @@ jobs:
       - name: 'Create .env.test file'
         run: |
           touch .env.test
-          echo TEST_VALUE="<This is a sample test value>" >> .env.test
+          echo TEST_VALUE=\"<This is a sample test value>\" >> .env.test
       - name: Run test
         run: |
           cat .env.test
@@ -56,13 +56,13 @@ jobs:
       - name: 'Create .env file'
         run: |
           touch .env
-          echo STAGE="${{ env.STAGE }}" >> .env
-          echo PROVIDER_NAME="${{ env.PROVIDER_NAME }}" >> .env
-          echo REGION="${{ env.REGION }}" >> .env
-          echo TZ="${{ env.TZ }}" >> .env
-          echo AUTH_LOGIN_JWT_TOKEN="${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN }}" >> .env
-          echo AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN="${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN }}" >> .env
-          echo URL__SENSOR_DATA_PREDICTION="${{ secrets.PROD__URL__SENSOR_DATA_PREDICTION }}" >> .env
+          echo STAGE=\${{ env.STAGE }}\ >> .env
+          echo PROVIDER_NAME=\${{ env.PROVIDER_NAME }}\ >> .env
+          echo REGION=\${{ env.REGION }}\ >> .env
+          echo TZ=\${{ env.TZ }}\ >> .env
+          echo AUTH_LOGIN_JWT_TOKEN=\${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN }}\ >> .env
+          echo AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN=\${{ secrets.PROD__AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN }}\ >> .env
+          echo URL__SENSOR_DATA_PREDICTION=\${{ secrets.PROD__URL__SENSOR_DATA_PREDICTION }}\ >> .env
       - name: Run Serverless deploy
         run: |
           serverless deploy --stage ${{ env.STAGE }} --force
