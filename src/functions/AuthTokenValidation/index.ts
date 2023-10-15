@@ -19,8 +19,6 @@ interface IAuthEvent {
 exports.main = async (event: APIGatewayAuthorizerEvent, context: any, callback: (...params: any) => any) => {
   let token: undefined | string = undefined
 
-  console.log({ event, context })
-
   switch (event.type) {
     case 'TOKEN': {
       token = event.authorizationToken
@@ -38,8 +36,6 @@ exports.main = async (event: APIGatewayAuthorizerEvent, context: any, callback: 
       break
     }
   }
-
-  console.log({ token })
 
   if (!token) throw new Error('Empty token')
 
