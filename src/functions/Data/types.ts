@@ -1,4 +1,5 @@
 type TRawDB_Action = 'raw_db__insert_data' | 'raw_db__get_data' | 'raw_db__query_data'
 type TAppDB_Action = 'app_db__get_data' | 'app_db__query_data' | 'app_db__add_feedback'
+type TS3_Action = 'logs__get_upload_url'
 
-export type TAllowAction = TRawDB_Action | TAppDB_Action
+export type TAllowAction = TRawDB_Action | TAppDB_Action | TS3_Action

@@ -5,7 +5,7 @@ import { apiGatewayResources } from '~aws_resources/api-gateway'
 dotenv.config()
 
 // Admin
-import AdminFunction from '~functions/Admin/routes'
+// import AdminFunction from '~functions/Admin/routes'
 // Auth
 import AuthFunction from '~functions/Auth/routes'
 import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
@@ -15,6 +15,7 @@ import DataFunction from '~functions/Data/routes'
 import WebSocketFunction from '~functions/WebSocket/routes'
 // DynamoDB stream
 import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'
+import { s3EnvironmentVariables, s3Resources } from '~aws_resources/s3'
 import DynamoDBStream from '~functions/DynamoDBStream/routes'
 
 // const serviceName = 'estec-backend'
@@ -62,6 +63,7 @@ const serverlessConfiguration: AWS = {
         'Fn::Join': ['', ['https://', { Ref: 'WebsocketsApi' }, '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}']],
       },
       ...dynamoDBEnvironmentVariables,
+      ...s3EnvironmentVariables,
     },
     iam: {
       role: {
@@ -79,7 +81,7 @@ const serverlessConfiguration: AWS = {
 
   // AWS Lambda functions declaration
   functions: {
-    AdminFunction,
+    // AdminFunction,
     AuthFunction,
     AuthTokenValidation,
     DataFunction,
@@ -91,6 +93,7 @@ const serverlessConfiguration: AWS = {
     exclude: ['./node_modules/**'],
     excludeDevDependencies: true,
   },
+
   custom: {
     esbuild: {
       bundle: true,
@@ -119,6 +122,7 @@ const serverlessConfiguration: AWS = {
     Resources: {
       ...dynamoDBResources,
       ...apiGatewayResources,
+      ...s3Resources,
     },
   },
 }
