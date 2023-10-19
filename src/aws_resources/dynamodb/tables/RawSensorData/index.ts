@@ -16,6 +16,20 @@ export interface IRawSensorData {
   '4K1KP01DRV01_M2001_EI_AVG'?: number
   '4K1KP01KHE01_B8701_AVG'?: number
 
+  _G1PJ01MCH02T8201_TIA_IO_Signal_Value: number
+  '4G1PS01GPJ02_T8201_AVG'?: number
+  '4R1GQ01JNT01_T8201_AVG'?: number
+  '41KP01DRV01_SP_AVG'?: number
+  SZ_Coal_Setpt_AVG?: number
+  PC_Coal_setpt_AVG?: number
+  '4G1FN01DRV01_M1001_SI_AVG'?: number
+  '4K1KP01DRV01_Speed_AVG'?: number
+  Actual_KF?: number
+  BZTL_AVG?: number
+  Kilnfeed_SP_Total_AVG?: number
+  Ratio_PC_AVG?: number
+  Result_AHC_AVG?: number
+
   note: {
     triggedFnProcessDataToAppDB: boolean
   }
@@ -64,6 +78,46 @@ const schemaDefinition: SchemaDefinition = {
   '4K1KP01KHE01_B8701_AVG': {
     type: Number,
   },
+  _G1PJ01MCH02T8201_TIA_IO_Signal_Value: {
+    type: Number,
+  },
+  '4G1PS01GPJ02_T8201_AVG': {
+    type: Number,
+  },
+  '4R1GQ01JNT01_T8201_AVG': {
+    type: Number,
+  },
+  '41KP01DRV01_SP_AVG': {
+    type: Number,
+  },
+  SZ_Coal_Setpt_AVG: {
+    type: Number,
+  },
+  PC_Coal_setpt_AVG: {
+    type: Number,
+  },
+  '4G1FN01DRV01_M1001_SI_AVG': {
+    type: Number,
+  },
+  '4K1KP01DRV01_Speed_AVG': {
+    type: Number,
+  },
+  Actual_KF: {
+    type: Number,
+  },
+  BZTL_AVG: {
+    type: Number,
+  },
+  Kilnfeed_SP_Total_AVG: {
+    type: Number,
+  },
+  Ratio_PC_AVG: {
+    type: Number,
+  },
+  Result_AHC_AVG: {
+    type: Number,
+  },
+
   note: {
     type: Object,
     schema: {

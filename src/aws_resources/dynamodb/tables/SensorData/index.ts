@@ -16,6 +16,19 @@ export interface ISensorData {
     KilnInletTemp?: number
     Nox?: number
     Pyrometer?: number
+    MaterialTowerHeat?: number
+    TowerOilTemp?: number
+    RecHeadTemp?: number
+    FurnaceSpeedSP?: number
+    CoalSP?: number
+    AlternativeCoalSP?: number
+    FanSP?: number
+    FurnaceSpeed?: number
+    ActualFuel?: number
+    AvgBZT?: number
+    ActualFuelSP?: number
+    HeatReplaceRatio?: number
+    TotalHeatConsumption?: number
   }
   Prediction: {
     Status: string
@@ -68,6 +81,46 @@ const schemaDefinition: SchemaDefinition = {
         type: Number,
       },
       Pyrometer: {
+        type: Number,
+      },
+
+      MaterialTowerHeat: {
+        type: Number,
+      },
+      TowerOilTemp: {
+        type: Number,
+      },
+      RecHeadTemp: {
+        type: Number,
+      },
+      FurnaceSpeedSP: {
+        type: Number,
+      },
+      CoalSP: {
+        type: Number,
+      },
+      AlternativeCoalSP: {
+        type: Number,
+      },
+      FanSP: {
+        type: Number,
+      },
+      FurnaceSpeed: {
+        type: Number,
+      },
+      ActualFuel: {
+        type: Number,
+      },
+      AvgBZT: {
+        type: Number,
+      },
+      ActualFuelSP: {
+        type: Number,
+      },
+      HeatReplaceRatio: {
+        type: Number,
+      },
+      TotalHeatConsumption: {
         type: Number,
       },
     },
