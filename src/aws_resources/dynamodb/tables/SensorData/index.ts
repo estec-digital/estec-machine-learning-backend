@@ -11,10 +11,10 @@ export interface ISensorData {
     GA01_Oxi?: number
     GA02_Oxi?: number
     GA03_Oxi?: number
-    GA04_Oxi?: number
+    // GA04_Oxi?: number
     KilnDriAmp?: number
     KilnInletTemp?: number
-    Nox?: number
+    // Nox?: number
     Pyrometer?: number
     MaterialTowerHeat?: number
     TowerOilTemp?: number

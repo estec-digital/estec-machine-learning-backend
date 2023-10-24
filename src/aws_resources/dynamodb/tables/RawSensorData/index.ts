@@ -7,11 +7,11 @@ export interface IRawSensorData {
   Time: string // Sort key: 19:35:18
   Date: string
   FactoryId: string // F_aBc1D
-  '4G1GA01XAC01_NO_AVG'?: number
+  // '4G1GA01XAC01_NO_AVG'?: number
   '4G1GA01XAC01_O2_AVG'?: number
   '4G1GA02XAC01_O2_AVG'?: number
   '4G1GA03XAC01_O2_AVG'?: number
-  '4G1GA04XAC01_O2_AVG'?: number
+  // '4G1GA04XAC01_O2_AVG'?: number
   '4G1KJ01JST00_T8401_AVG'?: number
   '4K1KP01DRV01_M2001_EI_AVG'?: number
   '4K1KP01KHE01_B8701_AVG'?: number
@@ -54,9 +54,9 @@ const schemaDefinition: SchemaDefinition = {
     type: String,
     required: true,
   },
-  '4G1GA01XAC01_NO_AVG': {
-    type: Number,
-  },
+  // '4G1GA01XAC01_NO_AVG': {
+  //   type: Number,
+  // },
   '4G1GA01XAC01_O2_AVG': {
     type: Number,
   },
@@ -66,9 +66,9 @@ const schemaDefinition: SchemaDefinition = {
   '4G1GA03XAC01_O2_AVG': {
     type: Number,
   },
-  '4G1GA04XAC01_O2_AVG': {
-    type: Number,
-  },
+  // '4G1GA04XAC01_O2_AVG': {
+  //   type: Number,
+  // },
   '4G1KJ01JST00_T8401_AVG': {
     type: Number,
   },
