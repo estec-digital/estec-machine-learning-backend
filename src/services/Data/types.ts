@@ -38,7 +38,6 @@ export interface IUpdateThreshold {
 
 export interface IUpdateThresholdResponse {
   message: string
-  factoryData: Object
 }
 
 export type IAddFeedback = ISensorDataFeedback

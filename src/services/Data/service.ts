@@ -89,25 +89,35 @@ export class DataService {
   }
 
   public static async updateFactoryData(params: IActionHandlerParams<Types.IUpdateThreshold>): Promise<Types.IUpdateThresholdResponse> {
-    const data = await Factory.model.update({
-      FactoryId: params.authData.FactoryId,
-      ThresholdData: {
-        Pyrometer_Min: params.bodyPayload.Pyrometer_Min,
-        Pyrometer_Max: params.bodyPayload.Pyrometer_Max,
-        BET_Min: params.bodyPayload.BET_Min,
-        BET_Max: params.bodyPayload.BET_Max,
-        Load_Min: params.bodyPayload.Load_Min,
-        Load_Max: params.bodyPayload.Load_Max,
-        GA01_Min: params.bodyPayload.GA01_Min,
-        GA01_Max: params.bodyPayload.GA01_Max,
-      },
-    })
+    if (
+      params.bodyPayload.Pyrometer_Min >= params.bodyPayload.Pyrometer_Max ||
+      params.bodyPayload.BET_Min >= params.bodyPayload.BET_Max ||
+      params.bodyPayload.Load_Min >= params.bodyPayload.Load_Max ||
+      params.bodyPayload.GA01_Min >= params.bodyPayload.GA01_Max
+    ) {
+      return {
+        message: "Min values can't be equal or greater than max values!!!!",
+      }
+    } else {
+      const data = await Factory.model.update({
+        FactoryId: params.authData.FactoryId,
+        ThresholdData: {
+          Pyrometer_Min: params.bodyPayload.Pyrometer_Min,
+          Pyrometer_Max: params.bodyPayload.Pyrometer_Max,
+          BET_Min: params.bodyPayload.BET_Min,
+          BET_Max: params.bodyPayload.BET_Max,
+          Load_Min: params.bodyPayload.Load_Min,
+          Load_Max: params.bodyPayload.Load_Max,
+          GA01_Min: params.bodyPayload.GA01_Min,
+          GA01_Max: params.bodyPayload.GA01_Max,
+        },
+      })
 
-    await data.save()
+      await data.save()
 
-    return {
-      message: 'Threshold updated successfully!!!',
-      factoryData: data,
+      return {
+        message: 'Threshold updated successfully!!!',
+      }
     }
   }
 }
