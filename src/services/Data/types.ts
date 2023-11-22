@@ -1,5 +1,5 @@
 import { SortOrder } from 'dynamoose/dist/General'
-import { ISensorData, ISensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { IFactory, ISensorData, ISensorDataFeedback } from '~aws_resources/dynamodb/tables/'
 
 export interface IRawDBGetData {
   Date: ISensorData['Date']
@@ -25,19 +25,10 @@ export interface IAppDBQueryData {
   limit?: number
 }
 
-export interface IUpdateThreshold {
-  Pyrometer_Min: number
-  Pyrometer_Max: number
-  BET_Min: number
-  BET_Max: number
-  Load_Min: number
-  Load_Max: number
-  GA01_Min: number
-  GA01_Max: number
-}
-
+export type IUpdateThreshold = IFactory['ThresholdData']
 export interface IUpdateThresholdResponse {
   message: string
+  threshold: IFactory['ThresholdData']
 }
 
 export type IAddFeedback = ISensorDataFeedback
