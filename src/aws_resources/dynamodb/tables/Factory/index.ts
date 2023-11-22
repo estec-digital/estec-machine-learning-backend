@@ -8,8 +8,8 @@ export interface IFactory {
     Pyrometer_Max: number
     BET_Min: number
     BET_Max: number
-    Load_Min: number
-    Load_Max: number
+    KilnDriAmp_Min: number
+    KilnDriAmp_Max: number
     GA01_Min: number
     GA01_Max: number
   }
@@ -28,27 +28,35 @@ const schemaDefinition: SchemaDefinition = {
     schema: {
       Pyrometer_Min: {
         type: Number,
+        default: 0,
       },
       Pyrometer_Max: {
         type: Number,
+        default: 0,
       },
       BET_Min: {
         type: Number,
+        default: 0,
       },
       BET_Max: {
         type: Number,
+        default: 0,
       },
-      Load_Min: {
+      KilnDriAmp_Min: {
         type: Number,
+        default: 0,
       },
-      Load_Max: {
+      KilnDriAmp_Max: {
         type: Number,
+        default: 0,
       },
       GA01_Min: {
         type: Number,
+        default: 0,
       },
       GA01_Max: {
         type: Number,
+        default: 0,
       },
     },
   },

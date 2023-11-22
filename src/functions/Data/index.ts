@@ -19,8 +19,17 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
 
     // Threshold
-    this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold)
-    this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold)
+    this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold, [])
+    this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [
+      'Pyrometer_Min',
+      'Pyrometer_Max',
+      'BET_Min',
+      'BET_Max',
+      'KilnDriAmp_Min',
+      'KilnDriAmp_Max',
+      'GA01_Min',
+      'GA01_Max',
+    ])
   }
 
   // RawDB

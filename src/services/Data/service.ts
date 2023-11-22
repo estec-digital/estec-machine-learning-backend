@@ -81,42 +81,39 @@ export class DataService {
   }
 
   // Threshold
-  public static async getFactoryData(params: IActionHandlerParams): Promise<IFactory> {
+  public static async getFactoryData(params: IActionHandlerParams): Promise<IFactory['ThresholdData']> {
     const data = await Factory.model.get({
       FactoryId: params.authData.FactoryId,
     })
-    return data
+    return data.ThresholdData
   }
 
   public static async updateFactoryData(params: IActionHandlerParams<Types.IUpdateThreshold>): Promise<Types.IUpdateThresholdResponse> {
     if (
-      params.bodyPayload.Pyrometer_Min >= params.bodyPayload.Pyrometer_Max ||
-      params.bodyPayload.BET_Min >= params.bodyPayload.BET_Max ||
-      params.bodyPayload.Load_Min >= params.bodyPayload.Load_Max ||
-      params.bodyPayload.GA01_Min >= params.bodyPayload.GA01_Max
+      Number(params.bodyPayload.Pyrometer_Min) >= Number(params.bodyPayload.Pyrometer_Max) ||
+      Number(params.bodyPayload.BET_Min) >= Number(params.bodyPayload.BET_Max) ||
+      Number(params.bodyPayload.KilnDriAmp_Min) >= Number(params.bodyPayload.KilnDriAmp_Max) ||
+      Number(params.bodyPayload.GA01_Min) >= Number(params.bodyPayload.GA01_Max)
     ) {
-      return {
-        message: "Min values can't be equal or greater than max values!!!!",
-      }
+      throw new Error("Min values can't be equal or greater than max values!!!!")
     } else {
       const data = await Factory.model.update({
         FactoryId: params.authData.FactoryId,
         ThresholdData: {
-          Pyrometer_Min: params.bodyPayload.Pyrometer_Min,
-          Pyrometer_Max: params.bodyPayload.Pyrometer_Max,
-          BET_Min: params.bodyPayload.BET_Min,
-          BET_Max: params.bodyPayload.BET_Max,
-          Load_Min: params.bodyPayload.Load_Min,
-          Load_Max: params.bodyPayload.Load_Max,
-          GA01_Min: params.bodyPayload.GA01_Min,
-          GA01_Max: params.bodyPayload.GA01_Max,
+          Pyrometer_Min: Number(params.bodyPayload.Pyrometer_Min),
+          Pyrometer_Max: Number(params.bodyPayload.Pyrometer_Max),
+          BET_Min: Number(params.bodyPayload.BET_Min),
+          BET_Max: Number(params.bodyPayload.BET_Max),
+          KilnDriAmp_Min: Number(params.bodyPayload.KilnDriAmp_Min),
+          KilnDriAmp_Max: Number(params.bodyPayload.KilnDriAmp_Max),
+          GA01_Min: Number(params.bodyPayload.GA01_Min),
+          GA01_Max: Number(params.bodyPayload.GA01_Max),
         },
       })
 
-      await data.save()
-
       return {
-        message: 'Threshold updated successfully!!!',
+        message: 'Updated threshold successfully!!!',
+        threshold: data.ThresholdData,
       }
     }
   }
