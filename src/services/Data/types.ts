@@ -25,4 +25,19 @@ export interface IAppDBQueryData {
   limit?: number
 }
 
+export interface IUpdateThreshold {
+  Pyrometer_Min: number
+  Pyrometer_Max: number
+  BET_Min: number
+  BET_Max: number
+  Load_Min: number
+  Load_Max: number
+  GA01_Min: number
+  GA01_Max: number
+}
+
+export interface IUpdateThresholdResponse {
+  message: string
+}
+
 export type IAddFeedback = ISensorDataFeedback

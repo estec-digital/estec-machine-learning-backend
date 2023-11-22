@@ -3,6 +3,16 @@ import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
 
 export interface IFactory {
   FactoryId: string // Partition key: F_aBc1D
+  ThresholdData: {
+    Pyrometer_Min: number
+    Pyrometer_Max: number
+    BET_Min: number
+    BET_Max: number
+    Load_Min: number
+    Load_Max: number
+    GA01_Min: number
+    GA01_Max: number
+  }
   Description: string
 }
 
@@ -12,6 +22,35 @@ const schemaDefinition: SchemaDefinition = {
   FactoryId: {
     type: String,
     hashKey: true,
+  },
+  ThresholdData: {
+    type: Object,
+    schema: {
+      Pyrometer_Min: {
+        type: Number,
+      },
+      Pyrometer_Max: {
+        type: Number,
+      },
+      BET_Min: {
+        type: Number,
+      },
+      BET_Max: {
+        type: Number,
+      },
+      Load_Min: {
+        type: Number,
+      },
+      Load_Max: {
+        type: Number,
+      },
+      GA01_Min: {
+        type: Number,
+      },
+      GA01_Max: {
+        type: Number,
+      },
+    },
   },
   Description: {
     type: String,

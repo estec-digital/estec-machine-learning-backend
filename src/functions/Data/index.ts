@@ -17,6 +17,10 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     this.restHandler.setAction('app_db__add_feedback', FunctionHandler.addFeedback, ['Date', 'Time', 'SensorData', 'Prediction', 'Feedback'])
 
     this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
+
+    // Threshold
+    this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold)
+    this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold)
   }
 
   // RawDB
@@ -48,6 +52,15 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   private static async logsGetUploadUrl(params: IActionHandlerParams<S3ServiceTypes.Logs_GetUploadUrl>) {
     const s3Service = new S3Service()
     return await s3Service.logsGetUploadUrl(params.bodyPayload)
+  }
+
+  // Threshold
+  private static async getThreshold(params: IActionHandlerParams) {
+    return await DataService.getFactoryData(params)
+  }
+
+  private static async updateThreshold(params: IActionHandlerParams<DataServiceTypes.IUpdateThreshold>) {
+    return await DataService.updateFactoryData(params)
   }
 }
 
