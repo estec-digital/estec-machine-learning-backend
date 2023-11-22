@@ -13,6 +13,9 @@ import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
 import DataFunction from '~functions/Data/routes'
 // WebSocket
 import WebSocketFunction from '~functions/WebSocket/routes'
+// Public functions (object)
+import PublicFunctions from '~functions/Public'
+
 // DynamoDB stream
 import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'
 import { s3EnvironmentVariables, s3Resources } from '~aws_resources/s3'
@@ -53,6 +56,8 @@ const serverlessConfiguration: AWS = {
     // Environment variables
     environment: {
       SERVICE: '${self:service}',
+      STAGE: '${self:provider.stage}',
+      REGION: '${self:provider.region}',
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       // WEBSOCKET_ENDPOINT: '${self:provider.stage}-${self:service}-websockets',
@@ -87,6 +92,7 @@ const serverlessConfiguration: AWS = {
     DataFunction,
     WebSocketFunction,
     DynamoDBStream,
+    ...PublicFunctions,
   },
   package: {
     individually: true,
