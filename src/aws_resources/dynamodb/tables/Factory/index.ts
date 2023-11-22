@@ -74,7 +74,4 @@ export const Factory = new DynamoDBTable<IFactory, EFactoryIndexes>({
   billing: {
     mode: 'PAY_PER_REQUEST',
   },
-  stream: {
-    streamViewType: 'NEW_IMAGE',
-  },
 })
