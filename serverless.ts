@@ -14,7 +14,7 @@ import DataFunction from '~functions/Data/routes'
 // WebSocket
 import WebSocketFunction from '~functions/WebSocket/routes'
 // Public functions (object)
-import PublicFunctions from '~functions/Public/routes'
+import PublicFunctions from '~functions/Public'
 
 // DynamoDB stream
 import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'

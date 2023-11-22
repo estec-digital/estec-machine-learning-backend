@@ -2,7 +2,7 @@ import { AWS } from '@serverless/typescript'
 import { handlerPath } from '~core/lambda/handler-resolver'
 
 const LambdaFunctionConfigs: AWS['functions'][any] = {
-  handler: `${handlerPath(__dirname)}/handler2.main`,
+  handler: `${handlerPath(__dirname)}/handler.main`,
   memorySize: 1024,
   timeout: 30,
   events: [

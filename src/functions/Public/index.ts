@@ -1,15 +1,7 @@
-import { IActionHandlerParams, RestHandler } from '~core/rest-handler/RestHandler'
-import { DataService } from '~services/Data'
-import * as Types from './types'
+import * as GetRequestFunctions from './get-requests'
+import { LambdaFunctionConfigs } from './post-requests/routes'
 
-class FunctionHandler extends RestHandler<Types.TAllowAction>() {
-  protected static setActions() {
-    this.restHandler.setAction('text-to-speech', FunctionHandler.textToSpeech, [])
-  }
-
-  private static async textToSpeech(params: IActionHandlerParams<any>) {
-    return await DataService.rawDBInsertData(params)
-  }
+export default {
+  PublicFunction: LambdaFunctionConfigs,
+  ...GetRequestFunctions,
 }
-
-export const main = FunctionHandler.getHandlerFunction()
