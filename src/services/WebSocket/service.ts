@@ -38,8 +38,16 @@ export class WebSocketService {
     return apiGatewayManagementApi
   }
 
+  private static async handlePostFailed(connectionId: string, error: any) {
+    await WebSocketConnection.model.delete({ ConnectionId: connectionId })
+    if (error.statusCode === 410 || error.statusCode === 404) {
+      console.log(`Connection id: "${connectionId}" is closed or not found.`)
+    } else {
+      console.error('Error sending message:', error)
+    }
+  }
+
   public static async postData(params: Types.TPostData): Promise<boolean> {
-    console.log('Line35: ', JSON.stringify(params))
     try {
       switch (params.type) {
         case 'POST_TO_SINGLE_CONNECTION': {
@@ -56,6 +64,7 @@ export class WebSocketService {
             } else {
               console.error('Error sending message:', error)
             }
+            await this.handlePostFailed(params.connectionId, error)
           }
           return true
         }
@@ -68,12 +77,7 @@ export class WebSocketService {
                 .postToConnection({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(data) })
                 .promise()
             } catch (error) {
-              await WebSocketConnection.model.delete({ ConnectionId: connection.ConnectionId })
-              if (error.statusCode === 410 || error.statusCode === 404) {
-                console.log(`Connection id: "${connection.ConnectionId}" is closed or not found.`)
-              } else {
-                console.error('Error sending message:', error)
-              }
+              await this.handlePostFailed(connection.ConnectionId, error)
             }
           }
           return true

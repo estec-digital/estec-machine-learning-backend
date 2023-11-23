@@ -48,7 +48,7 @@ export const s3Resources: Omit<AWS['resources']['Resources'], 'Fn::Transform'> =
 }
 
 export const s3EnvironmentVariables = {
-  S3_BUCKET_NAME: {
+  S3_PRIVATE_BUCKET_NAME: {
     Ref: bucketName,
   },
 }

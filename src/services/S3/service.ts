@@ -10,7 +10,7 @@ export class S3Service {
   }
 
   async logsGetUploadUrl(params: S3ServiceTypes.Logs_GetUploadUrl) {
-    const bucketName = process.env.S3_BUCKET_NAME
+    const bucketName = process.env.S3_PRIVATE_BUCKET_NAME
     let fileKey = dayjs().format('YYYY-MM-DD HH:mm:ss:SSS')
 
     if (params.Folder) {
