@@ -1,17 +1,15 @@
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
+import { ISensorData } from '../SensorData'
 
 export interface IFactory {
   FactoryId: string // Partition key: F_aBc1D
   ThresholdData: {
-    Pyrometer_Min: number
-    Pyrometer_Max: number
-    BET_Min: number
-    BET_Max: number
-    KilnDriAmp_Min: number
-    KilnDriAmp_Max: number
-    GA01_Min: number
-    GA01_Max: number
+    [key in keyof ISensorData['SensorData']]: {
+      min: number
+      max: number
+      enableAlert: boolean
+    }
   }
   Description: string
 }
@@ -25,40 +23,6 @@ const schemaDefinition: SchemaDefinition = {
   },
   ThresholdData: {
     type: Object,
-    schema: {
-      Pyrometer_Min: {
-        type: Number,
-        default: 0,
-      },
-      Pyrometer_Max: {
-        type: Number,
-        default: 0,
-      },
-      BET_Min: {
-        type: Number,
-        default: 0,
-      },
-      BET_Max: {
-        type: Number,
-        default: 0,
-      },
-      KilnDriAmp_Min: {
-        type: Number,
-        default: 0,
-      },
-      KilnDriAmp_Max: {
-        type: Number,
-        default: 0,
-      },
-      GA01_Min: {
-        type: Number,
-        default: 0,
-      },
-      GA01_Max: {
-        type: Number,
-        default: 0,
-      },
-    },
   },
   Description: {
     type: String,
@@ -66,7 +30,7 @@ const schemaDefinition: SchemaDefinition = {
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: false,
+  saveUnknown: ['ThresholdData.**'],
   timestamps: {
     createdAt: ['CreatedAt'],
     updatedAt: ['UpdatedAt'],

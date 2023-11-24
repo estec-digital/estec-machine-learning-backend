@@ -20,16 +20,8 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
     // Threshold
     this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold, [])
-    this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [
-      'Pyrometer_Min',
-      'Pyrometer_Max',
-      'BET_Min',
-      'BET_Max',
-      'KilnDriAmp_Min',
-      'KilnDriAmp_Max',
-      'GA01_Min',
-      'GA01_Max',
-    ])
+    this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [])
+    this.restHandler.setAction('threshold__toggle_enable_alert', FunctionHandler.toggleEnableAlert, ['key', 'enableAlert'])
   }
 
   // RawDB
@@ -70,6 +62,10 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async updateThreshold(params: IActionHandlerParams<DataServiceTypes.IUpdateThreshold>) {
     return await DataService.updateFactoryData(params)
+  }
+
+  private static async toggleEnableAlert(params: IActionHandlerParams<DataServiceTypes.IToggleEnableAlert>) {
+    return await DataService.toggleEnableAlert(params)
   }
 }
 
