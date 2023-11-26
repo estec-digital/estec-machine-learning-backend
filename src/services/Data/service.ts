@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
+import * as lodash from 'lodash'
 import { getPartitionKey_SensorData } from '~aws_resources/dynamodb/middlewares'
 import { Factory, IFactory, IRawSensorData, ISensorData, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
 import { IActionHandlerParams } from '~core/rest-handler/RestHandler'
@@ -89,32 +90,48 @@ export class DataService {
   }
 
   public static async updateFactoryData(params: IActionHandlerParams<Types.IUpdateThreshold>): Promise<Types.IUpdateThresholdResponse> {
-    if (
-      Number(params.bodyPayload.Pyrometer_Min) >= Number(params.bodyPayload.Pyrometer_Max) ||
-      Number(params.bodyPayload.BET_Min) >= Number(params.bodyPayload.BET_Max) ||
-      Number(params.bodyPayload.KilnDriAmp_Min) >= Number(params.bodyPayload.KilnDriAmp_Max) ||
-      Number(params.bodyPayload.GA01_Min) >= Number(params.bodyPayload.GA01_Max)
-    ) {
-      throw new Error("Min values can't be equal or greater than max values!!!!")
-    } else {
-      const data = await Factory.model.update({
-        FactoryId: params.authData.FactoryId,
-        ThresholdData: {
-          Pyrometer_Min: Number(params.bodyPayload.Pyrometer_Min),
-          Pyrometer_Max: Number(params.bodyPayload.Pyrometer_Max),
-          BET_Min: Number(params.bodyPayload.BET_Min),
-          BET_Max: Number(params.bodyPayload.BET_Max),
-          KilnDriAmp_Min: Number(params.bodyPayload.KilnDriAmp_Min),
-          KilnDriAmp_Max: Number(params.bodyPayload.KilnDriAmp_Max),
-          GA01_Min: Number(params.bodyPayload.GA01_Min),
-          GA01_Max: Number(params.bodyPayload.GA01_Max),
-        },
-      })
+    if (Object.values(params.bodyPayload).every((threshold) => Number(threshold.min) <= Number(threshold.max)) === false) {
+      throw new Error('Max values has to be greater than min values!')
+    }
 
-      return {
-        message: 'Updated threshold successfully!!!',
-        threshold: data.ThresholdData,
+    const data = await Factory.model.get({ FactoryId: params.authData.FactoryId })
+
+    for (const [key, threshold] of Object.entries(params.bodyPayload ?? {})) {
+      threshold.min = Number(threshold.min)
+      threshold.max = Number(threshold.max)
+      if (typeof data.ThresholdData[key as keyof ISensorData['SensorData']]?.enableAlert !== 'boolean') {
+        threshold.enableAlert = true
       }
     }
+
+    if (!data) {
+      throw new Error("Cannot update Factory's threshold!")
+    }
+
+    data.ThresholdData = lodash.merge(data.ThresholdData, params.bodyPayload ?? {})
+    await data.save()
+
+    return {
+      message: 'Updated threshold successfully!!!',
+      threshold: data.ThresholdData,
+    }
+  }
+
+  public static async toggleEnableAlert(params: IActionHandlerParams<Types.IToggleEnableAlert>): Promise<boolean> {
+    const data = await Factory.model.get({ FactoryId: params.authData.FactoryId })
+
+    if (!data) {
+      throw new Error("Cannot update Factory's threshold!")
+    }
+
+    if (!(typeof data.ThresholdData[params.bodyPayload.key] === 'object')) {
+      throw new Error('Invalid threshold key!')
+    }
+
+    data.ThresholdData[params.bodyPayload.key].enableAlert = params.bodyPayload.enableAlert
+
+    await data.save()
+
+    return true
   }
 }

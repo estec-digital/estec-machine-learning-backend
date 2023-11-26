@@ -37,33 +37,24 @@ export class DynamoDBStreamService {
 
     if (item.Prediction === undefined) {
       // console.log(`[AppDB] Item(${item.Date} ${item.Time}) calling ML lambda fn to get prediction...`)
-
-      const predictionData = await axios.post(
-        process.env.URL__SENSOR_DATA_PREDICTION,
-        {
-          SensorData: item.SensorData,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
+      item.Prediction = {} as any
+      try {
+        const predictionData = await axios.post(
+          process.env.URL__SENSOR_DATA_PREDICTION,
+          {
+            SensorData: item.SensorData,
           },
-        },
-      )
-
-      // const predictionData = await LambdaService.invokeFunction({
-      //   functionName: process.env.LAMBDA__SENSOR_DATA_PREDICTION,
-      //   payload: {
-      //     SensorData: item.SensorData,
-      //   },
-      // })
-
-      if (predictionData.data) {
-        item.Prediction = predictionData.data
-      }
-
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        if (predictionData.data) {
+          item.Prediction = predictionData.data
+        }
+      } catch (error) {}
       await item.save()
-
-      // console.log(`[AppDB] Item(${item.Date} ${item.Time}) got prediction successfully.`)
     } else {
       if (timeOfSensorData.isValid() && Math.abs(now.diff(timeOfSensorData, 'second')) <= 60 * 15) {
         const allActiveWSConnections = await WebSocketConnection.model.query({ FactoryId: item.FactoryId }).using(EWebSocketConnectionIndexes.GSI_FactoryId).exec()

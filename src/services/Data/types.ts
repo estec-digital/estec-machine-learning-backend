@@ -32,3 +32,8 @@ export interface IUpdateThresholdResponse {
 }
 
 export type IAddFeedback = ISensorDataFeedback
+
+export type IToggleEnableAlert = {
+  key: keyof IFactory['ThresholdData']
+  enableAlert: boolean
+}
