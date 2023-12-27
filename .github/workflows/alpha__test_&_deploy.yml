@@ -62,7 +62,7 @@ jobs:
           echo TZ='"${{ env.TZ }}"' >> .env
           echo AUTH_LOGIN_JWT_TOKEN='"${{ secrets.ALPHA__AUTH_LOGIN_JWT_TOKEN }}"' >> .env
           echo AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN='"${{ secrets.ALPHA__AUTH_LOGIN_JWT_TOKEN_EXPIRES_IN }}"' >> .env
-          echo URL__SENSOR_DATA_PREDICTION='"${{ secrets.ALPHA__URL__SENSOR_DATA_PREDICTION }}"' >> .env
+          echo AI_BASE_URL='"${{ secrets.ALPHA__AI_BASE_URL }}"' >> .env
           echo GCP_CREDENTIALS_BASE64='"${{ secrets.ALPHA__GCP_CREDENTIALS_BASE64 }}"' >> .env
       - name: Run Serverless deploy
         run: |
