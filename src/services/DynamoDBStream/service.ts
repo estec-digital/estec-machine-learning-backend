@@ -19,7 +19,7 @@ export class DynamoDBStreamService {
         connectionId,
         data: async (): Promise<ISensorDataStreamData> => ({
           type: 'SENSOR_DATA__LAST_ITEMS',
-          data: await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: 60 }),
+          data: await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: 30 }),
         }),
       })
     }
@@ -37,23 +37,20 @@ export class DynamoDBStreamService {
 
     if (item.Prediction === undefined) {
       // console.log(`[AppDB] Item(${item.Date} ${item.Time}) calling ML lambda fn to get prediction...`)
-      item.Prediction = {} as any
+      item.Prediction = {} as ISensorData['Prediction']
       try {
-        const predictionData = await axios.post(
-          process.env.URL__SENSOR_DATA_PREDICTION,
-          {
-            SensorData: item.SensorData,
+        const predictionData = await axios.post(`${process.env.AI_BASE_URL}/status_predict`, item.SensorData, {
+          headers: {
+            'Content-Type': 'application/json',
           },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        )
+        })
         if (predictionData.data) {
           item.Prediction = predictionData.data
+          console.log('Line49: ', predictionData.data)
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log('Line52: ', error)
+      }
       await item.save()
     } else {
       if (timeOfSensorData.isValid() && Math.abs(now.diff(timeOfSensorData, 'second')) <= 60 * 15) {
@@ -67,7 +64,8 @@ export class DynamoDBStreamService {
         for (const [factoryId, wsConnections] of Object.entries(mapOfWSConnectionsByFactoryId)) {
           if (wsConnections.length > 0) {
             await executeConcurrently(wsConnections, 10, async (connections) => {
-              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 60 })
+              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 30 })
+              console.log({ bbb: { connections, length: connections.length } })
               await Promise.all(
                 connections.map((connection) =>
                   WebSocketService.postData({

@@ -31,9 +31,13 @@ export interface ISensorData {
     TotalHeatConsumption?: number
   }
   Prediction: {
-    Status: string
-    RecommendationActions: string
-    Reliability: number
+    GeneralStatus: string
+    RecommendationActions: {
+      [key in keyof ISensorData['SensorData']]?: string
+    }
+    StatusInDetails: {
+      [key in keyof ISensorData['SensorData']]?: string
+    }
   }
 }
 
@@ -129,21 +133,21 @@ const schemaDefinition: SchemaDefinition = {
   Prediction: {
     type: Object,
     schema: {
-      Status: {
-        type: Object,
+      GeneralStatus: {
+        type: String,
       },
       RecommendationActions: {
         type: Object,
       },
-      Reliability: {
-        type: Number,
+      StatusInDetails: {
+        type: Object,
       },
     },
   },
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Prediction.Status.**', 'Prediction.RecommendationActions.**'],
+  saveUnknown: ['Prediction.**', 'Prediction.RecommendationActions.**', 'Prediction.StatusInDetails.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
