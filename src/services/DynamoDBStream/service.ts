@@ -35,23 +35,59 @@ export class DynamoDBStreamService {
     const timeOfSensorData = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
     const now = dayjs()
 
-    if (item.Prediction === undefined) {
-      // console.log(`[AppDB] Item(${item.Date} ${item.Time}) calling ML lambda fn to get prediction...`)
-      item.Prediction = {} as ISensorData['Prediction']
+    if (item.Prediction === undefined || item.Trending === undefined) {
+      // Status prediction
+      item.Prediction = null
       try {
-        const predictionData = await axios.post(`${process.env.AI_BASE_URL}/status_predict`, item.SensorData, {
+        const statusPredictionResponse = await axios.post(`${process.env.AI_BASE_URL}/status_predict`, item.SensorData, {
           headers: {
             'Content-Type': 'application/json',
           },
         })
-        if (predictionData.data) {
-          item.Prediction = predictionData.data
-          console.log('Line49: ', predictionData.data)
+        if (statusPredictionResponse.data) {
+          item.Prediction = statusPredictionResponse.data
+          console.log('Success in getting status', statusPredictionResponse.data)
         }
       } catch (error) {
-        console.log('Line52: ', error)
+        console.log('Failed in getting statusPredictionResponse', error)
       }
+
+      // Trending prediction
+      item.Trending = null
+      try {
+        const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
+        const fiveMinutesAgo: dayjs.Dayjs[] = []
+        for (let i = 1; i <= 5; i++) {
+          fiveMinutesAgo.push(nowDate.subtract(i, 'minute'))
+        }
+        const fiveMinutesAgoDataResponse = await SensorData.model.batchGet(
+          fiveMinutesAgo.map((dateTime) => ({
+            FactoryId_Date: `${item.FactoryId}::${dateTime.format('YYYY-MM-DD')}`,
+            Time: dateTime.format('HH:mm:ss'),
+          })),
+        )
+        const fiveMinutesAgoSensorData: ISensorData['Trending'] = []
+        for (const dateTime of fiveMinutesAgo) {
+          const data = fiveMinutesAgoDataResponse.find((e) => e.Date === dateTime.format('YYYY-MM-DD') && e.Time === dateTime.format('HH:mm:ss'))
+          fiveMinutesAgoSensorData.push(data?.SensorData || null)
+        }
+
+        const trendingResponse = await axios.post(`${process.env.AI_BASE_URL}/trend_predict`, fiveMinutesAgoSensorData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        if (trendingResponse.data && Array.isArray(trendingResponse.data)) {
+          item.Trending = trendingResponse.data
+          console.log('Success in getting trending', trendingResponse.data)
+        }
+      } catch (error) {
+        console.log('Failed in getting trending', error)
+      }
+
       await item.save()
+
+      console.log('Final item:', item)
     } else {
       if (timeOfSensorData.isValid() && Math.abs(now.diff(timeOfSensorData, 'second')) <= 60 * 15) {
         const allActiveWSConnections = await WebSocketConnection.model.query({ FactoryId: item.FactoryId }).using(EWebSocketConnectionIndexes.GSI_FactoryId).exec()
@@ -89,11 +125,11 @@ export class DynamoDBStreamService {
   public static async handleRawSensorDataStream(record: IDynamoDBRecord<IRawSensorData>) {
     const newRawSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IRawSensorData
 
-    const item = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
-    if (!item) return
-    if (item.note?.triggedFnProcessDataToAppDB === false) {
-      item.note.triggedFnProcessDataToAppDB = true
-      await item.save()
+    const rawSensorData = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
+    if (!rawSensorData) return
+    if (rawSensorData.note?.triggedFnProcessDataToAppDB === false) {
+      rawSensorData.note.triggedFnProcessDataToAppDB = true
+      await rawSensorData.save()
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
 
       const sensorData: Partial<ISensorData> = {
@@ -126,7 +162,11 @@ export class DynamoDBStreamService {
         },
       }
 
-      await SensorData.model.create(sensorData)
+      const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
+      if (!sensorDataItem) {
+        await SensorData.model.create(sensorData)
+      }
+
       // console.log(`RawDB] Item(${item.Date} ${item.Time}) Saved data [AppDB] successfully.`)
     }
 

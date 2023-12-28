@@ -1,7 +1,6 @@
 import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
-
 export interface ISensorData {
   FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
   Time: string // Sort key: 19:35:18
@@ -30,15 +29,16 @@ export interface ISensorData {
     HeatReplaceRatio?: number
     TotalHeatConsumption?: number
   }
-  Prediction: {
-    GeneralStatus: string
-    RecommendationActions: {
+  Prediction: null | {
+    GeneralStatus?: string
+    RecommendationActions?: {
       [key in keyof ISensorData['SensorData']]?: string
     }
-    StatusInDetails: {
+    StatusInDetails?: {
       [key in keyof ISensorData['SensorData']]?: string
     }
   }
+  Trending: Partial<ISensorData['SensorData'] | null>[]
 }
 
 export enum ESensorDataIndexes {}
@@ -130,24 +130,14 @@ const schemaDefinition: SchemaDefinition = {
     },
     default: {},
   },
-  Prediction: {
-    type: Object,
-    schema: {
-      GeneralStatus: {
-        type: String,
-      },
-      RecommendationActions: {
-        type: Object,
-      },
-      StatusInDetails: {
-        type: Object,
-      },
-    },
-  },
+
+  // Prediction: Nullable object
+
+  // Trending: Nullable array
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Prediction.**', 'Prediction.RecommendationActions.**', 'Prediction.StatusInDetails.**'],
+  saveUnknown: ['Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
