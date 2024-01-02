@@ -57,7 +57,7 @@ export class DynamoDBStreamService {
       try {
         const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
         const fiveMinutesAgo: dayjs.Dayjs[] = []
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 0; i < 5; i++) {
           fiveMinutesAgo.push(nowDate.subtract(i, 'minute'))
         }
         const fiveMinutesAgoDataResponse = await SensorData.model.batchGet(
