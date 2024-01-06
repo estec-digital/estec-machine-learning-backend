@@ -1,8 +1,16 @@
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
+import { ISensorData } from '../SensorData'
 
 export interface IFactory {
   FactoryId: string // Partition key: F_aBc1D
+  ThresholdData: {
+    [key in keyof ISensorData['SensorData']]: {
+      min: number
+      max: number
+      enableAlert: boolean
+    }
+  }
   Description: string
 }
 
@@ -13,13 +21,16 @@ const schemaDefinition: SchemaDefinition = {
     type: String,
     hashKey: true,
   },
+  ThresholdData: {
+    type: Object,
+  },
   Description: {
     type: String,
   },
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: false,
+  saveUnknown: ['ThresholdData.**'],
   timestamps: {
     createdAt: ['CreatedAt'],
     updatedAt: ['UpdatedAt'],

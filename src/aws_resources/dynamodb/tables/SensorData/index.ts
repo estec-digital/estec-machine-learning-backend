@@ -1,7 +1,6 @@
 import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
-
 export interface ISensorData {
   FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
   Time: string // Sort key: 19:35:18
@@ -11,17 +10,35 @@ export interface ISensorData {
     GA01_Oxi?: number
     GA02_Oxi?: number
     GA03_Oxi?: number
-    GA04_Oxi?: number
+    // GA04_Oxi?: number
     KilnDriAmp?: number
     KilnInletTemp?: number
-    Nox?: number
+    // Nox?: number
     Pyrometer?: number
+    MaterialTowerHeat?: number
+    TowerOilTemp?: number
+    RecHeadTemp?: number
+    FurnaceSpeedSP?: number
+    CoalSP?: number
+    AlternativeCoalSP?: number
+    FanSP?: number
+    FurnaceSpeed?: number
+    ActualFuel?: number
+    AvgBZT?: number
+    ActualFuelSP?: number
+    HeatReplaceRatio?: number
+    TotalHeatConsumption?: number
   }
-  Prediction: {
-    Status: string
-    RecommendationActions: string
-    Reliability: number
+  Prediction: null | {
+    GeneralStatus?: string
+    RecommendationActions?: {
+      [key in keyof ISensorData['SensorData']]?: string
+    }
+    StatusInDetails?: {
+      [key in keyof ISensorData['SensorData']]?: string
+    }
   }
+  Trending: Partial<ISensorData['SensorData'] | null>[]
 }
 
 export enum ESensorDataIndexes {}
@@ -70,27 +87,57 @@ const schemaDefinition: SchemaDefinition = {
       Pyrometer: {
         type: Number,
       },
-    },
-    default: {},
-  },
-  Prediction: {
-    type: Object,
-    schema: {
-      Status: {
-        type: Object,
+
+      MaterialTowerHeat: {
+        type: Number,
       },
-      RecommendationActions: {
-        type: Object,
+      TowerOilTemp: {
+        type: Number,
       },
-      Reliability: {
+      RecHeadTemp: {
+        type: Number,
+      },
+      FurnaceSpeedSP: {
+        type: Number,
+      },
+      CoalSP: {
+        type: Number,
+      },
+      AlternativeCoalSP: {
+        type: Number,
+      },
+      FanSP: {
+        type: Number,
+      },
+      FurnaceSpeed: {
+        type: Number,
+      },
+      ActualFuel: {
+        type: Number,
+      },
+      AvgBZT: {
+        type: Number,
+      },
+      ActualFuelSP: {
+        type: Number,
+      },
+      HeatReplaceRatio: {
+        type: Number,
+      },
+      TotalHeatConsumption: {
         type: Number,
       },
     },
+    default: {},
   },
+
+  // Prediction: Nullable object
+
+  // Trending: Nullable array
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Prediction.Status.**', 'Prediction.RecommendationActions.**'],
+  saveUnknown: ['Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },

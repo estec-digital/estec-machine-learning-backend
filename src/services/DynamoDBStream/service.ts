@@ -19,7 +19,7 @@ export class DynamoDBStreamService {
         connectionId,
         data: async (): Promise<ISensorDataStreamData> => ({
           type: 'SENSOR_DATA__LAST_ITEMS',
-          data: await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: 60 }),
+          data: await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: 30 }),
         }),
       })
     }
@@ -35,35 +35,59 @@ export class DynamoDBStreamService {
     const timeOfSensorData = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
     const now = dayjs()
 
-    if (item.Prediction === undefined) {
-      // console.log(`[AppDB] Item(${item.Date} ${item.Time}) calling ML lambda fn to get prediction...`)
-
-      const predictionData = await axios.post(
-        process.env.URL__SENSOR_DATA_PREDICTION,
-        {
-          SensorData: item.SensorData,
-        },
-        {
+    if (item.Prediction === undefined || item.Trending === undefined) {
+      // Status prediction
+      item.Prediction = null
+      try {
+        const statusPredictionResponse = await axios.post(`${process.env.AI_BASE_URL}/status_predict`, item.SensorData, {
           headers: {
             'Content-Type': 'application/json',
           },
-        },
-      )
+        })
+        if (statusPredictionResponse.data) {
+          item.Prediction = statusPredictionResponse.data
+          console.log('Success in getting status', statusPredictionResponse.data)
+        }
+      } catch (error) {
+        console.log('Failed in getting statusPredictionResponse', error)
+      }
 
-      // const predictionData = await LambdaService.invokeFunction({
-      //   functionName: process.env.LAMBDA__SENSOR_DATA_PREDICTION,
-      //   payload: {
-      //     SensorData: item.SensorData,
-      //   },
-      // })
+      // Trending prediction
+      item.Trending = null
+      try {
+        const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
+        const fiveMinutesAgo: dayjs.Dayjs[] = []
+        for (let i = 0; i < 5; i++) {
+          fiveMinutesAgo.push(nowDate.subtract(i, 'minute'))
+        }
+        const fiveMinutesAgoDataResponse = await SensorData.model.batchGet(
+          fiveMinutesAgo.map((dateTime) => ({
+            FactoryId_Date: `${item.FactoryId}::${dateTime.format('YYYY-MM-DD')}`,
+            Time: dateTime.format('HH:mm:ss'),
+          })),
+        )
+        const fiveMinutesAgoSensorData: ISensorData['Trending'] = []
+        for (const dateTime of fiveMinutesAgo) {
+          const data = fiveMinutesAgoDataResponse.find((e) => e.Date === dateTime.format('YYYY-MM-DD') && e.Time === dateTime.format('HH:mm:ss'))
+          fiveMinutesAgoSensorData.push(data?.SensorData || null)
+        }
 
-      if (predictionData.data) {
-        item.Prediction = predictionData.data
+        const trendingResponse = await axios.post(`${process.env.AI_BASE_URL}/trend_predict`, fiveMinutesAgoSensorData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        if (trendingResponse.data && Array.isArray(trendingResponse.data)) {
+          item.Trending = trendingResponse.data
+          console.log('Success in getting trending', trendingResponse.data)
+        }
+      } catch (error) {
+        console.log('Failed in getting trending', error)
       }
 
       await item.save()
 
-      // console.log(`[AppDB] Item(${item.Date} ${item.Time}) got prediction successfully.`)
+      console.log('Final item:', item)
     } else {
       if (timeOfSensorData.isValid() && Math.abs(now.diff(timeOfSensorData, 'second')) <= 60 * 15) {
         const allActiveWSConnections = await WebSocketConnection.model.query({ FactoryId: item.FactoryId }).using(EWebSocketConnectionIndexes.GSI_FactoryId).exec()
@@ -76,7 +100,8 @@ export class DynamoDBStreamService {
         for (const [factoryId, wsConnections] of Object.entries(mapOfWSConnectionsByFactoryId)) {
           if (wsConnections.length > 0) {
             await executeConcurrently(wsConnections, 10, async (connections) => {
-              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 60 })
+              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 30 })
+              console.log({ bbb: { connections, length: connections.length } })
               await Promise.all(
                 connections.map((connection) =>
                   WebSocketService.postData({
@@ -100,11 +125,11 @@ export class DynamoDBStreamService {
   public static async handleRawSensorDataStream(record: IDynamoDBRecord<IRawSensorData>) {
     const newRawSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IRawSensorData
 
-    const item = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
-    if (!item) return
-    if (item.note?.triggedFnProcessDataToAppDB === false) {
-      item.note.triggedFnProcessDataToAppDB = true
-      await item.save()
+    const rawSensorData = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
+    if (!rawSensorData) return
+    if (rawSensorData.note?.triggedFnProcessDataToAppDB === false) {
+      rawSensorData.note.triggedFnProcessDataToAppDB = true
+      await rawSensorData.save()
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
 
       const sensorData: Partial<ISensorData> = {
@@ -113,18 +138,35 @@ export class DynamoDBStreamService {
         Time: newRawSensorDataItem.Time,
         FactoryId: newRawSensorDataItem.FactoryId,
         SensorData: {
-          GA01_Oxi: newRawSensorDataItem['4G1GA01XAC01_O2_AV'],
+          GA01_Oxi: newRawSensorDataItem['4G1GA01XAC01_O2_AVG'],
           GA02_Oxi: newRawSensorDataItem['4G1GA02XAC01_O2_AVG'],
           GA03_Oxi: newRawSensorDataItem['4G1GA03XAC01_O2_AVG'],
-          GA04_Oxi: newRawSensorDataItem['4G1GA04XAC01_O2_AVG'],
+          // GA04_Oxi: newRawSensorDataItem['4G1GA04XAC01_O2_AVG'],
           KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
           KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
-          Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
+          // Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
           Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
+          MaterialTowerHeat: newRawSensorDataItem['_G1PJ01MCH02T8201_TIA_IO_Signal_Value'],
+          TowerOilTemp: newRawSensorDataItem['4G1PS01GPJ02_T8201_AVG'],
+          RecHeadTemp: newRawSensorDataItem['4R1GQ01JNT01_T8201_AVG'],
+          FurnaceSpeedSP: newRawSensorDataItem['41KP01DRV01_SP_AVG'],
+          CoalSP: newRawSensorDataItem['SZ_Coal_Setpt_AVG'],
+          AlternativeCoalSP: newRawSensorDataItem['PC_Coal_setpt_AVG'],
+          FanSP: newRawSensorDataItem['4G1FN01DRV01_M1001_SI_AVG'],
+          FurnaceSpeed: newRawSensorDataItem['4K1KP01DRV01_Speed_AVG'],
+          ActualFuel: newRawSensorDataItem['Actual_KF'],
+          AvgBZT: newRawSensorDataItem['BZTL_AVG'],
+          ActualFuelSP: newRawSensorDataItem['Kilnfeed_SP_Total_AVG'],
+          HeatReplaceRatio: newRawSensorDataItem['Ratio_PC_AVG'],
+          TotalHeatConsumption: newRawSensorDataItem['Result_AHC_AVG'],
         },
       }
 
-      await SensorData.model.create(sensorData)
+      const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
+      if (!sensorDataItem) {
+        await SensorData.model.create(sensorData)
+      }
+
       // console.log(`RawDB] Item(${item.Date} ${item.Time}) Saved data [AppDB] successfully.`)
     }
 

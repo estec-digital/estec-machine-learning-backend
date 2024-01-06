@@ -1,12 +1,12 @@
 {
   "cSpell.ignoreWords": ["esbuild", "middyfy", "unmarshall"],
-  "cSpell.words": ["envkey", "estec", "middlewares", "nosql", "websockets"],
+  "cSpell.words": ["Elskin", "envkey", "estec", "middlewares", "nosql", "websockets"],
   "javascript.implicitProjectConfig.experimentalDecorators": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.formatDocument": true,
-    "source.fixAll.eslint": true,
-    "source.organizeImports": true
+    "source.formatDocument": "explicit",
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

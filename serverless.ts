@@ -5,7 +5,7 @@ import { apiGatewayResources } from '~aws_resources/api-gateway'
 dotenv.config()
 
 // Admin
-import AdminFunction from '~functions/Admin/routes'
+// import AdminFunction from '~functions/Admin/routes'
 // Auth
 import AuthFunction from '~functions/Auth/routes'
 import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
@@ -13,8 +13,12 @@ import AuthTokenValidation from '~functions/AuthTokenValidation/routes'
 import DataFunction from '~functions/Data/routes'
 // WebSocket
 import WebSocketFunction from '~functions/WebSocket/routes'
+// Public functions (object)
+import PublicFunctions from '~functions/Public'
+
 // DynamoDB stream
 import { dynamoDBEnvironmentVariables, dynamoDBResources } from '~aws_resources/dynamodb'
+import { s3EnvironmentVariables, s3Resources } from '~aws_resources/s3'
 import DynamoDBStream from '~functions/DynamoDBStream/routes'
 
 // const serviceName = 'estec-backend'
@@ -52,6 +56,8 @@ const serverlessConfiguration: AWS = {
     // Environment variables
     environment: {
       SERVICE: '${self:service}',
+      STAGE: '${self:provider.stage}',
+      REGION: '${self:provider.region}',
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       // WEBSOCKET_ENDPOINT: '${self:provider.stage}-${self:service}-websockets',
@@ -62,6 +68,7 @@ const serverlessConfiguration: AWS = {
         'Fn::Join': ['', ['https://', { Ref: 'WebsocketsApi' }, '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}']],
       },
       ...dynamoDBEnvironmentVariables,
+      ...s3EnvironmentVariables,
     },
     iam: {
       role: {
@@ -79,18 +86,20 @@ const serverlessConfiguration: AWS = {
 
   // AWS Lambda functions declaration
   functions: {
-    AdminFunction,
+    // AdminFunction,
     AuthFunction,
     AuthTokenValidation,
     DataFunction,
     WebSocketFunction,
     DynamoDBStream,
+    ...PublicFunctions,
   },
   package: {
     individually: true,
     exclude: ['./node_modules/**'],
     excludeDevDependencies: true,
   },
+
   custom: {
     esbuild: {
       bundle: true,
@@ -119,6 +128,7 @@ const serverlessConfiguration: AWS = {
     Resources: {
       ...dynamoDBResources,
       ...apiGatewayResources,
+      ...s3Resources,
     },
   },
 }

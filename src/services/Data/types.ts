@@ -1,5 +1,5 @@
 import { SortOrder } from 'dynamoose/dist/General'
-import { ISensorData, ISensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { IFactory, ISensorData, ISensorDataFeedback } from '~aws_resources/dynamodb/tables/'
 
 export interface IRawDBGetData {
   Date: ISensorData['Date']
@@ -25,4 +25,15 @@ export interface IAppDBQueryData {
   limit?: number
 }
 
+export type IUpdateThreshold = IFactory['ThresholdData']
+export interface IUpdateThresholdResponse {
+  message: string
+  threshold: IFactory['ThresholdData']
+}
+
 export type IAddFeedback = ISensorDataFeedback
+
+export type IToggleEnableAlert = {
+  key: keyof IFactory['ThresholdData']
+  enableAlert: boolean
+}

@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
+import * as lodash from 'lodash'
 import { getPartitionKey_SensorData } from '~aws_resources/dynamodb/middlewares'
-import { IRawSensorData, ISensorData, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { Factory, IFactory, IRawSensorData, ISensorData, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
 import { IActionHandlerParams } from '~core/rest-handler/RestHandler'
 import * as Types from './types'
 
@@ -77,6 +78,60 @@ export class DataService {
 
   public static async addFeedback(params: IActionHandlerParams<Types.IAddFeedback>): Promise<boolean> {
     await SensorDataFeedback.model.create({ ...params.bodyPayload, FactoryId: params.authData.FactoryId })
+    return true
+  }
+
+  // Threshold
+  public static async getFactoryData(params: IActionHandlerParams): Promise<IFactory['ThresholdData']> {
+    const data = await Factory.model.get({
+      FactoryId: params.authData.FactoryId,
+    })
+    return data.ThresholdData
+  }
+
+  public static async updateFactoryData(params: IActionHandlerParams<Types.IUpdateThreshold>): Promise<Types.IUpdateThresholdResponse> {
+    if (Object.values(params.bodyPayload).every((threshold) => Number(threshold.min) <= Number(threshold.max)) === false) {
+      throw new Error('Max values has to be greater than min values!')
+    }
+
+    const data = await Factory.model.get({ FactoryId: params.authData.FactoryId })
+
+    for (const [key, threshold] of Object.entries(params.bodyPayload ?? {})) {
+      threshold.min = Number(threshold.min)
+      threshold.max = Number(threshold.max)
+      if (typeof data.ThresholdData[key as keyof ISensorData['SensorData']]?.enableAlert !== 'boolean') {
+        threshold.enableAlert = true
+      }
+    }
+
+    if (!data) {
+      throw new Error("Cannot update Factory's threshold!")
+    }
+
+    data.ThresholdData = lodash.merge(data.ThresholdData, params.bodyPayload ?? {})
+    await data.save()
+
+    return {
+      message: 'Updated threshold successfully!!!',
+      threshold: data.ThresholdData,
+    }
+  }
+
+  public static async toggleEnableAlert(params: IActionHandlerParams<Types.IToggleEnableAlert>): Promise<boolean> {
+    const data = await Factory.model.get({ FactoryId: params.authData.FactoryId })
+
+    if (!data) {
+      throw new Error("Cannot update Factory's threshold!")
+    }
+
+    if (!(typeof data.ThresholdData[params.bodyPayload.key] === 'object')) {
+      throw new Error('Invalid threshold key!')
+    }
+
+    data.ThresholdData[params.bodyPayload.key].enableAlert = params.bodyPayload.enableAlert
+
+    await data.save()
+
     return true
   }
 }

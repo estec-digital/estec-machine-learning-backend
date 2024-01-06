@@ -1,6 +1,7 @@
 import { IRawSensorData } from '~aws_resources/dynamodb/tables'
 import { IActionHandlerParams, RestHandler } from '~core/rest-handler/RestHandler'
 import { DataService, Types as DataServiceTypes } from '~services/Data'
+import { S3Service, S3ServiceTypes } from '~services/S3'
 import * as Types from './types'
 
 class FunctionHandler extends RestHandler<Types.TAllowAction>() {
@@ -14,6 +15,13 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
     this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['Date'])
     this.restHandler.setAction('app_db__add_feedback', FunctionHandler.addFeedback, ['Date', 'Time', 'SensorData', 'Prediction', 'Feedback'])
+
+    this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
+
+    // Threshold
+    this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold, [])
+    this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [])
+    this.restHandler.setAction('threshold__toggle_enable_alert', FunctionHandler.toggleEnableAlert, ['key', 'enableAlert'])
   }
 
   // RawDB
@@ -40,6 +48,24 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async addFeedback(params: IActionHandlerParams<DataServiceTypes.IAddFeedback>) {
     return await DataService.addFeedback(params)
+  }
+
+  private static async logsGetUploadUrl(params: IActionHandlerParams<S3ServiceTypes.Logs_GetUploadUrl>) {
+    const s3Service = new S3Service()
+    return await s3Service.logsGetUploadUrl(params.bodyPayload)
+  }
+
+  // Threshold
+  private static async getThreshold(params: IActionHandlerParams) {
+    return await DataService.getFactoryData(params)
+  }
+
+  private static async updateThreshold(params: IActionHandlerParams<DataServiceTypes.IUpdateThreshold>) {
+    return await DataService.updateFactoryData(params)
+  }
+
+  private static async toggleEnableAlert(params: IActionHandlerParams<DataServiceTypes.IToggleEnableAlert>) {
+    return await DataService.toggleEnableAlert(params)
   }
 }
 
