@@ -36,50 +36,42 @@ export class DynamoDBStreamService {
     const now = dayjs()
 
     if (item.Prediction === undefined || item.Trending === undefined) {
-      // Status prediction
       item.Prediction = null
-      try {
-        const statusPredictionResponse = await axios.post(`${process.env.AI_BASE_URL}/status_predict`, item.SensorData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        if (statusPredictionResponse.data) {
-          item.Prediction = statusPredictionResponse.data
-          console.log('Success in getting status', statusPredictionResponse.data)
-        }
-      } catch (error) {
-        console.log('Failed in getting statusPredictionResponse', error)
-      }
-
-      // Trending prediction
       item.Trending = null
+
       try {
         const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
-        const fiveMinutesAgo: dayjs.Dayjs[] = []
-        for (let i = 0; i < 5; i++) {
-          fiveMinutesAgo.push(nowDate.subtract(i, 'minute'))
+        const fifteenMinutesAgo: dayjs.Dayjs[] = []
+        for (let i = 0; i < 15; i++) {
+          fifteenMinutesAgo.push(nowDate.subtract(i, 'minute'))
         }
-        const fiveMinutesAgoDataResponse = await SensorData.model.batchGet(
-          fiveMinutesAgo.map((dateTime) => ({
+        const fifteenMinutesAgoDataResponse = await SensorData.model.batchGet(
+          fifteenMinutesAgo.map((dateTime) => ({
             FactoryId_Date: `${item.FactoryId}::${dateTime.format('YYYY-MM-DD')}`,
             Time: dateTime.format('HH:mm:ss'),
           })),
         )
-        const fiveMinutesAgoSensorData: ISensorData['Trending'] = []
-        for (const dateTime of fiveMinutesAgo) {
-          const data = fiveMinutesAgoDataResponse.find((e) => e.Date === dateTime.format('YYYY-MM-DD') && e.Time === dateTime.format('HH:mm:ss'))
-          fiveMinutesAgoSensorData.push(data?.SensorData || null)
+        const fifteenMinutesAgoSensorData: ISensorData['Trending'] = []
+        for (const dateTime of fifteenMinutesAgo) {
+          const data = fifteenMinutesAgoDataResponse.find((e) => e.Date === dateTime.format('YYYY-MM-DD') && e.Time === dateTime.format('HH:mm:ss'))
+          fifteenMinutesAgoSensorData.push(data?.SensorData || null)
         }
 
-        const trendingResponse = await axios.post(`${process.env.AI_BASE_URL}/trend_predict`, fiveMinutesAgoSensorData, {
+        const response = await axios.post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
           headers: {
             'Content-Type': 'application/json',
           },
         })
-        if (trendingResponse.data && Array.isArray(trendingResponse.data)) {
-          item.Trending = trendingResponse.data
-          console.log('Success in getting trending', trendingResponse.data)
+
+        if (response.data) {
+          item.Prediction = {
+            GeneralStatus: response.data.status,
+            RecommendationActions: response.data.recommendation,
+            StatusInDetails: response.data.past_trend?.trend_info,
+          }
+          item.Trending = response.data?.future_trend?.data ?? null
+
+          console.log('Success in getting trending', response.data)
         }
       } catch (error) {
         console.log('Failed in getting trending', error)
