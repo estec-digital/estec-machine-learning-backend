@@ -32,7 +32,7 @@ export interface ISensorData {
   Prediction: null | {
     GeneralStatus?: string
     RecommendationActions?: {
-      [key in keyof ISensorData['SensorData']]?: string
+      [key in keyof ISensorData['SensorData']]?: number
     }
     StatusInDetails?: {
       [key in keyof ISensorData['SensorData']]?: string
