@@ -70,6 +70,7 @@ export class DynamoDBStreamService {
             StatusInDetails: response.data.past_trend?.trend_info,
           }
           item.Trending = response.data?.future_trend?.data ?? null
+          item.PastTrendData = response.data?.past_trend?.data ?? null
 
           console.log('Success in getting trending', response.data)
         }

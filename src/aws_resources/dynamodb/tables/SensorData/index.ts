@@ -38,6 +38,7 @@ export interface ISensorData {
       [key in keyof ISensorData['SensorData']]?: string
     }
   }
+  PastTrendData: Partial<ISensorData['SensorData'] | null>[]
   Trending: Partial<ISensorData['SensorData'] | null>[]
 }
 
@@ -137,7 +138,7 @@ const schemaDefinition: SchemaDefinition = {
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**'],
+  saveUnknown: ['Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
