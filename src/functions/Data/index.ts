@@ -14,14 +14,15 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     // AppDB
     this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
     this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['Date'])
-    this.restHandler.setAction('app_db__add_feedback', FunctionHandler.addFeedback, ['Date', 'Time', 'SensorData', 'Prediction', 'Feedback'])
-
     this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
 
     // Threshold
     this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold, [])
     this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [])
     this.restHandler.setAction('threshold__toggle_enable_alert', FunctionHandler.toggleEnableAlert, ['key', 'enableAlert'])
+
+    this.restHandler.setAction('feedback__get_feedback_ticket', FunctionHandler.getFeedbackTicket, ['Date', 'Time'])
+    this.restHandler.setAction('feedback__save_feedback', FunctionHandler.saveFeedback, ['Date', 'Time', 'Feedback'])
   }
 
   // RawDB
@@ -46,10 +47,6 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     return await DataService.appDBQueryData(params)
   }
 
-  private static async addFeedback(params: IActionHandlerParams<DataServiceTypes.IAddFeedback>) {
-    return await DataService.addFeedback(params)
-  }
-
   private static async logsGetUploadUrl(params: IActionHandlerParams<S3ServiceTypes.Logs_GetUploadUrl>) {
     const s3Service = new S3Service()
     return await s3Service.logsGetUploadUrl(params.bodyPayload)
@@ -66,6 +63,14 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async toggleEnableAlert(params: IActionHandlerParams<DataServiceTypes.IToggleEnableAlert>) {
     return await DataService.toggleEnableAlert(params)
+  }
+
+  private static async getFeedbackTicket(params: IActionHandlerParams<DataServiceTypes.IGetFeedbackTicket>) {
+    return await DataService.getFeedbackTicket(params)
+  }
+
+  private static async saveFeedback(params: IActionHandlerParams<DataServiceTypes.ISaveFeedback>) {
+    return await DataService.saveFeedback(params)
   }
 }
 

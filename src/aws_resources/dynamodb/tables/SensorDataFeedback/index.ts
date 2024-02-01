@@ -2,40 +2,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
+import { ISensorData } from '../SensorData'
 
-export interface ISensorDataFeedback {
+export type ISensorDataFeedback = ISensorData & {
   FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
   Hash: string // Sort key: 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
-  Date: string
-  Time: string // LSI
-  FactoryId: string // F_aBc1D
-  SensorData: {
-    GA01_Oxi?: number
-    GA02_Oxi?: number
-    GA03_Oxi?: number
-    GA04_Oxi?: number
-    KilnDriAmp?: number
-    KilnInletTemp?: number
-    Nox?: number
-    Pyrometer?: number
-  }
-  Prediction: {
-    Status: object
-    RecommendationActions: object
-    Reliability: number
-  }
-  Feedback: {
-    Status: {
-      IsGood: boolean | null
-      Suggestions: string[]
-      FeedbackDetail: string
-    }
-    RecommendationActions: {
-      IsGood: boolean | null
-      Suggestions: string[]
-      FeedbackDetail: string
-    }
-  }
+  Feedback: object
 }
 
 export enum ESensorDataFeedbackIndexes {
@@ -52,11 +24,10 @@ const schemaDefinition: SchemaDefinition = {
     rangeKey: true,
     default: () => uuidv4(),
   },
-  Date: {
-    type: String,
-    required: true,
-  },
   Time: {
+    type: String,
+  },
+  Date: {
     type: String,
     required: true,
   },
@@ -91,58 +62,61 @@ const schemaDefinition: SchemaDefinition = {
       Pyrometer: {
         type: Number,
       },
-    },
-    default: {},
-  },
-  Prediction: {
-    type: Object,
-    schema: {
-      Status: {
-        type: Object,
+
+      MaterialTowerHeat: {
+        type: Number,
       },
-      RecommendationActions: {
-        type: Object,
+      TowerOilTemp: {
+        type: Number,
       },
-      Reliability: {
+      RecHeadTemp: {
+        type: Number,
+      },
+      FurnaceSpeedSP: {
+        type: Number,
+      },
+      CoalSP: {
+        type: Number,
+      },
+      AlternativeCoalSP: {
+        type: Number,
+      },
+      FanSP: {
+        type: Number,
+      },
+      FurnaceSpeed: {
+        type: Number,
+      },
+      ActualFuel: {
+        type: Number,
+      },
+      AvgBZT: {
+        type: Number,
+      },
+      ActualFuelSP: {
+        type: Number,
+      },
+      HeatReplaceRatio: {
+        type: Number,
+      },
+      TotalHeatConsumption: {
         type: Number,
       },
     },
+    default: {},
   },
+
+  // Prediction: Nullable object
+
+  // Trending: Nullable array
+
   Feedback: {
     type: Object,
-    schema: {
-      Status: {
-        type: Object,
-        schema: {
-          // IsGood: Boolean | Null
-          Suggestions: {
-            type: Set,
-            schema: [String],
-          },
-          FeedbackDetail: {
-            type: String,
-          },
-        },
-      },
-      RecommendationActions: {
-        type: Object,
-        schema: {
-          // IsGood: Boolean | Null
-          Suggestions: {
-            type: Set,
-            schema: [String],
-          },
-          FeedbackDetail: {
-            type: String,
-          },
-        },
-      },
-    },
   },
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Feedback.Status.*', 'Feedback.RecommendationActions.*'],
+  saveUnknown: ['Feedback.*', 'Feedback.**'],
   timestamps: {
     createdAt: ['CreatedAt'],
   },
