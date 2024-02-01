@@ -37,3 +37,14 @@ export type IToggleEnableAlert = {
   key: keyof IFactory['ThresholdData']
   enableAlert: boolean
 }
+
+export type IGetFeedbackTicket = {
+  Date: string
+  Time: string
+}
+
+export type ISaveFeedback = {
+  Date: string
+  Time: string
+  Feedback: object
+}
