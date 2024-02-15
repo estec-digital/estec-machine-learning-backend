@@ -134,7 +134,7 @@ export class DataService {
     // 3 latest items
     const targetTime = dayjs(`${params.bodyPayload.Date} ${params.bodyPayload.Time}`, 'YYYY-MM-DD HH:mm:ss')
     const latestTimes: dayjs.Dayjs[] = []
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       latestTimes.push(targetTime.subtract(i, 'minute'))
     }
     const latestItems = await SensorData.model.batchGet(
