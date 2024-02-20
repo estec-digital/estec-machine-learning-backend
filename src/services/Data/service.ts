@@ -76,11 +76,6 @@ export class DataService {
     return arrItems.map((e) => e).reverse()
   }
 
-  public static async addFeedback(params: IActionHandlerParams<Types.IAddFeedback>): Promise<boolean> {
-    await SensorDataFeedback.model.create({ ...params.bodyPayload, FactoryId: params.authData.FactoryId })
-    return true
-  }
-
   // Threshold
   public static async getFactoryData(params: IActionHandlerParams): Promise<IFactory['ThresholdData']> {
     const data = await Factory.model.get({
@@ -131,6 +126,39 @@ export class DataService {
     data.ThresholdData[params.bodyPayload.key].enableAlert = params.bodyPayload.enableAlert
 
     await data.save()
+
+    return true
+  }
+
+  public static async getFeedbackTicket(params: IActionHandlerParams<Types.IGetFeedbackTicket>): Promise<ISensorData[]> {
+    // 3 latest items
+    const targetTime = dayjs(`${params.bodyPayload.Date} ${params.bodyPayload.Time}`, 'YYYY-MM-DD HH:mm:ss')
+    const latestTimes: dayjs.Dayjs[] = []
+    for (let i = 0; i < 4; i++) {
+      latestTimes.push(targetTime.subtract(i, 'minute'))
+    }
+    const latestItems = await SensorData.model.batchGet(
+      latestTimes.map((dateTime) => ({
+        FactoryId_Date: `${params.authData.FactoryId}::${dateTime.format('YYYY-MM-DD')}`,
+        Time: dateTime.format('HH:mm:ss'),
+      })),
+    )
+    return latestItems
+  }
+
+  public static async saveFeedback(params: IActionHandlerParams<Types.ISaveFeedback>): Promise<boolean> {
+    const data = await SensorData.model.get({
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+      Time: params.bodyPayload.Time,
+    })
+    if (!data) {
+      throw new Error('Invalid data to feedback!')
+    }
+
+    await SensorDataFeedback.model.create({
+      ...data,
+      Feedback: params.bodyPayload.Feedback,
+    })
 
     return true
   }
