@@ -8,20 +8,28 @@ import { IDynamoDBRecord } from '~core/dynamoose/types'
 import { ISensorDataStreamData } from '~functions/DynamoDBStream/types'
 import { DataService } from '~services/Data'
 import { WebSocketService } from '~services/WebSocket'
+import { getBatches } from '~shared/utils'
 
 export class DynamoDBStreamService {
   public static async handleConnectionInsertionStream(record: IDynamoDBRecord<IWebSocketConnection>) {
     const newWSConnectionItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IWebSocketConnection
     const connectionId = newWSConnectionItem.ConnectionId
     if (connectionId) {
-      await WebSocketService.postData({
-        type: 'POST_TO_SINGLE_CONNECTION',
-        connectionId,
-        data: async (): Promise<ISensorDataStreamData> => ({
-          type: 'SENSOR_DATA__LAST_ITEMS',
-          data: await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: 30 }),
-        }),
-      })
+      const totalItems = 120
+      const batches = getBatches(totalItems, 30)
+      const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: totalItems })
+      let totalSent = 0
+      for (const batchSize of batches) {
+        await WebSocketService.postData({
+          type: 'POST_TO_SINGLE_CONNECTION',
+          connectionId,
+          data: async (): Promise<ISensorDataStreamData> => ({
+            type: 'SENSOR_DATA__LAST_ITEMS',
+            data: data.slice(totalSent, totalSent + batchSize),
+          }),
+        })
+        totalSent += batchSize
+      }
     }
   }
 
@@ -93,8 +101,7 @@ export class DynamoDBStreamService {
         for (const [factoryId, wsConnections] of Object.entries(mapOfWSConnectionsByFactoryId)) {
           if (wsConnections.length > 0) {
             await executeConcurrently(wsConnections, 10, async (connections) => {
-              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 30 })
-              console.log({ bbb: { connections, length: connections.length } })
+              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 10 })
               await Promise.all(
                 connections.map((connection) =>
                   WebSocketService.postData({

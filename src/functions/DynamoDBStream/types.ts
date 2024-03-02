@@ -6,5 +6,5 @@ export type TAllowAction = TDataBaseAction
 
 export interface ISensorDataStreamData {
   type: 'SENSOR_DATA__LAST_ITEMS' | 'SENSOR_DATA__FULL_DAY'
-  data: ISensorData[]
+  data: Partial<ISensorData>[]
 }
