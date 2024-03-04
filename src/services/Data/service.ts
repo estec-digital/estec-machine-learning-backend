@@ -66,7 +66,7 @@ export class DataService {
     return data
   }
 
-  public static async appDBQueryLastItemsOfSensorData(params: { numberOfItems: number; factoryId: string }): Promise<ISensorData[]> {
+  public static async appDBQueryLastItemsOfSensorData(params: { numberOfItems: number; factoryId: string }): Promise<Partial<ISensorData>[]> {
     const now = dayjs()
     const arrItems = await SensorData.model
       .query({ FactoryId_Date: getPartitionKey_SensorData({ Date: now.format('YYYY-MM-DD'), FactoryId: params.factoryId }) })
