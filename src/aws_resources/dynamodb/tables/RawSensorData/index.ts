@@ -54,69 +54,6 @@ const schemaDefinition: SchemaDefinition = {
     type: String,
     required: true,
   },
-  // '4G1GA01XAC01_NO_AVG': {
-  //   type: Number,
-  // },
-  '4G1GA01XAC01_O2_AVG': {
-    type: Number,
-  },
-  '4G1GA02XAC01_O2_AVG': {
-    type: Number,
-  },
-  '4G1GA03XAC01_O2_AVG': {
-    type: Number,
-  },
-  // '4G1GA04XAC01_O2_AVG': {
-  //   type: Number,
-  // },
-  '4G1KJ01JST00_T8401_AVG': {
-    type: Number,
-  },
-  '4K1KP01DRV01_M2001_EI_AVG': {
-    type: Number,
-  },
-  '4K1KP01KHE01_B8701_AVG': {
-    type: Number,
-  },
-  _G1PJ01MCH02T8201_TIA_IO_Signal_Value: {
-    type: Number,
-  },
-  '4G1PS01GPJ02_T8201_AVG': {
-    type: Number,
-  },
-  '4R1GQ01JNT01_T8201_AVG': {
-    type: Number,
-  },
-  '41KP01DRV01_SP_AVG': {
-    type: Number,
-  },
-  SZ_Coal_Setpt_AVG: {
-    type: Number,
-  },
-  PC_Coal_setpt_AVG: {
-    type: Number,
-  },
-  '4G1FN01DRV01_M1001_SI_AVG': {
-    type: Number,
-  },
-  '4K1KP01DRV01_Speed_AVG': {
-    type: Number,
-  },
-  Actual_KF: {
-    type: Number,
-  },
-  BZTL_AVG: {
-    type: Number,
-  },
-  Kilnfeed_SP_Total_AVG: {
-    type: Number,
-  },
-  Ratio_PC_AVG: {
-    type: Number,
-  },
-  Result_AHC_AVG: {
-    type: Number,
-  },
 
   note: {
     type: Object,
@@ -135,6 +72,7 @@ const schemaSettings: SchemaSettings = {
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
+  saveUnknown: true
 }
 
 export const RawSensorData = new DynamoDBTable<IRawSensorData, ERawSensorDataIndexes>({
