@@ -80,123 +80,6 @@ const schemaDefinition: SchemaDefinition = {
   },
   SensorData: {
     type: Object,
-    schema: {
-      GA01_Oxi: {
-        type: Number,
-      },
-      GA02_Oxi: {
-        type: Number,
-      },
-      GA03_Oxi: {
-        type: Number,
-      },
-      GA04_Oxi: {
-        type: Number,
-      },
-      KilnDriAmp: {
-        type: Number,
-      },
-      KilnInletTemp: {
-        type: Number,
-      },
-      Nox: {
-        type: Number,
-      },
-      Pyrometer: {
-        type: Number,
-      },
-
-      MaterialTowerHeat: {
-        type: Number,
-      },
-      TowerOilTemp: {
-        type: Number,
-      },
-      RecHeadTemp: {
-        type: Number,
-      },
-      FurnaceSpeedSP: {
-        type: Number,
-      },
-      CoalSP: {
-        type: Number,
-      },
-      AlternativeCoalSP: {
-        type: Number,
-      },
-      FanSP: {
-        type: Number,
-      },
-      FurnaceSpeed: {
-        type: Number,
-      },
-      ActualFuel: {
-        type: Number,
-      },
-      AvgBZT: {
-        type: Number,
-      },
-      ActualFuelSP: {
-        type: Number,
-      },
-      HeatReplaceRatio: {
-        type: Number,
-      },
-      TotalHeatConsumption: {
-        type: Number,
-      },
-      Fan_4S1: {
-        type: Number,
-      },
-      Kilnhood_Pressure: {
-        type: Number,
-      },
-      Thermal_Exhaust: {
-        type: Number,
-      },
-      Fan_4E1_Valve_Open_Close_Degree: {
-        type: Number,
-      },
-      '4E1GP1JST01_Pressure': {
-        type: Number,
-      },
-      Valve_Open_Degree: {
-        type: Number,
-      },
-      Actual_Feed_Rate_PC: {
-        type: Number,
-      },
-      Coal_Blower_Pressure_01: {
-        type: Number,
-      },
-      Actual_Feed_Rate_SZ: {
-        type: Number,
-      },
-      Coal_Blower_Pressure_02: {
-        type: Number,
-      },
-      Fabric_Scale: {
-        type: Number,
-      },
-      Temperature_C1: {
-        type: Number,
-      },
-      Temperature_C2: {
-        type: Number,
-      },
-      Temperature_C3: {
-        type: Number,
-      },
-      Hydraulic_Pressure: {
-        type: Number,
-      },
-      Conveyor_Flow_Rate_01: {
-        type: Number,
-      },
-      Conveyor_Flow_Rate_02: {
-        type: Number,
-      },
-    },
     default: {},
   },
 
@@ -206,7 +89,7 @@ const schemaDefinition: SchemaDefinition = {
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**'],
+  saveUnknown: ['SensorData.*', 'Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
