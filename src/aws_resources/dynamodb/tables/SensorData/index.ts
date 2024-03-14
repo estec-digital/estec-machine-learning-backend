@@ -28,6 +28,23 @@ export interface ISensorData {
     ActualFuelSP?: number
     HeatReplaceRatio?: number
     TotalHeatConsumption?: number
+    Fan_4S1?: number
+    Kilnhood_Pressure?: number
+    Thermal_Exhaust?: number
+    Fan_4E1_Valve_Open_Close_Degree?: number
+    '4E1GP1JST01_Pressure'?: number
+    Valve_Open_Degree?: number
+    Actual_Feed_Rate_PC?: number
+    Coal_Blower_Pressure_01?: number
+    Actual_Feed_Rate_SZ?: number
+    Coal_Blower_Pressure_02?: number
+    Fabric_Scale?: number
+    Temperature_C1?: number
+    Temperature_C2?: number
+    Temperature_C3?: number
+    Hydraulic_Pressure?: number
+    Conveyor_Flow_Rate_01?: number
+    Conveyor_Flow_Rate_02?: number
   }
   Prediction: null | {
     GeneralStatus?: string
@@ -126,6 +143,57 @@ const schemaDefinition: SchemaDefinition = {
         type: Number,
       },
       TotalHeatConsumption: {
+        type: Number,
+      },
+      Fan_4S1: {
+        type: Number,
+      },
+      Kilnhood_Pressure: {
+        type: Number,
+      },
+      Thermal_Exhaust: {
+        type: Number,
+      },
+      Fan_4E1_Valve_Open_Close_Degree: {
+        type: Number,
+      },
+      '4E1GP1JST01_Pressure': {
+        type: Number,
+      },
+      Valve_Open_Degree: {
+        type: Number,
+      },
+      Actual_Feed_Rate_PC: {
+        type: Number,
+      },
+      Coal_Blower_Pressure_01: {
+        type: Number,
+      },
+      Actual_Feed_Rate_SZ: {
+        type: Number,
+      },
+      Coal_Blower_Pressure_02: {
+        type: Number,
+      },
+      Fabric_Scale: {
+        type: Number,
+      },
+      Temperature_C1: {
+        type: Number,
+      },
+      Temperature_C2: {
+        type: Number,
+      },
+      Temperature_C3: {
+        type: Number,
+      },
+      Hydraulic_Pressure: {
+        type: Number,
+      },
+      Conveyor_Flow_Rate_01: {
+        type: Number,
+      },
+      Conveyor_Flow_Rate_02: {
         type: Number,
       },
     },
