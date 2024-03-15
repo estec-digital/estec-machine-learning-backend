@@ -23,6 +23,8 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
     this.restHandler.setAction('feedback__get_feedback_ticket', FunctionHandler.getFeedbackTicket, ['Date', 'Time'])
     this.restHandler.setAction('feedback__save_feedback', FunctionHandler.saveFeedback, ['Date', 'Time', 'Feedback'])
+    this.restHandler.setAction('feedback_get_list', FunctionHandler.getListOfFeedbacks, ['From', 'To'])
+    this.restHandler.setAction('feedback_get_item', FunctionHandler.getSingleFeedback, ['Date', 'Hash'])
   }
 
   // RawDB
@@ -71,6 +73,14 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async saveFeedback(params: IActionHandlerParams<DataServiceTypes.ISaveFeedback>) {
     return await DataService.saveFeedback(params)
+  }
+
+  private static async getListOfFeedbacks(params: IActionHandlerParams<DataServiceTypes.IGetListOfFeedbacks>) {
+    return await DataService.getListOfFeedbacks(params)
+  }
+
+  private static async getSingleFeedback(params: IActionHandlerParams<DataServiceTypes.IGetSingleFeedback>) {
+    return await DataService.getSingleFeedback(params)
   }
 }
 
