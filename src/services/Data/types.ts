@@ -48,3 +48,13 @@ export type ISaveFeedback = {
   Time: string
   Feedback: object
 }
+
+export type IGetListOfFeedbacks = {
+  From: string
+  To: string
+}
+
+export type IGetSingleFeedback = {
+  Date: string
+  Hash: string
+}

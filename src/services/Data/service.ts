@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
 import * as lodash from 'lodash'
 import { getPartitionKey_SensorData } from '~aws_resources/dynamodb/middlewares'
-import { Factory, IFactory, IRawSensorData, ISensorData, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { Factory, IFactory, IRawSensorData, ISensorData, ISensorDataFeedback, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
 import { IActionHandlerParams } from '~core/rest-handler/RestHandler'
 import * as Types from './types'
 
@@ -161,5 +161,34 @@ export class DataService {
     })
 
     return true
+  }
+
+  public static async getListOfFeedbacks(params: IActionHandlerParams<Types.IGetListOfFeedbacks>): Promise<ISensorDataFeedback[]> {
+    const from = dayjs(params.bodyPayload.From, 'YYYY-MM-DD HH:mm:ss')
+    const to = dayjs(params.bodyPayload.To, 'YYYY-MM-DD HH:mm:ss')
+
+    if (!(from.isValid() && to.isValid())) {
+      throw new Error('Invalid date time!')
+    }
+
+    const response = await SensorDataFeedback.model
+      .scan({
+        FactoryId: params.authData.FactoryId,
+        CreatedAt: { between: [from.toDate().getTime(), to.toDate().getTime()] },
+      })
+      .exec()
+
+    return response
+  }
+
+  public static async getSingleFeedback(params: IActionHandlerParams<Types.IGetSingleFeedback>): Promise<ISensorDataFeedback> {
+    const response: ISensorDataFeedback[] = await SensorDataFeedback.model
+      .query({
+        FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+        Hash: params.bodyPayload.Hash,
+      })
+      .exec()
+
+    return response?.[0] ?? null
   }
 }

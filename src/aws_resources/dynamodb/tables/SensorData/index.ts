@@ -28,6 +28,23 @@ export interface ISensorData {
     ActualFuelSP?: number
     HeatReplaceRatio?: number
     TotalHeatConsumption?: number
+    Fan_4S1?: number
+    Kilnhood_Pressure?: number
+    Thermal_Exhaust?: number
+    Fan_4E1_Valve_Open_Close_Degree?: number
+    '4E1GP1JST01_Pressure'?: number
+    Valve_Open_Degree?: number
+    Actual_Feed_Rate_PC?: number
+    Coal_Blower_Pressure_01?: number
+    Actual_Feed_Rate_SZ?: number
+    Coal_Blower_Pressure_02?: number
+    Fabric_Scale?: number
+    Temperature_C1?: number
+    Temperature_C2?: number
+    Temperature_C3?: number
+    Hydraulic_Pressure?: number
+    Conveyor_Flow_Rate_01?: number
+    Conveyor_Flow_Rate_02?: number
   }
   Prediction: null | {
     GeneralStatus?: string
@@ -63,72 +80,6 @@ const schemaDefinition: SchemaDefinition = {
   },
   SensorData: {
     type: Object,
-    schema: {
-      GA01_Oxi: {
-        type: Number,
-      },
-      GA02_Oxi: {
-        type: Number,
-      },
-      GA03_Oxi: {
-        type: Number,
-      },
-      GA04_Oxi: {
-        type: Number,
-      },
-      KilnDriAmp: {
-        type: Number,
-      },
-      KilnInletTemp: {
-        type: Number,
-      },
-      Nox: {
-        type: Number,
-      },
-      Pyrometer: {
-        type: Number,
-      },
-
-      MaterialTowerHeat: {
-        type: Number,
-      },
-      TowerOilTemp: {
-        type: Number,
-      },
-      RecHeadTemp: {
-        type: Number,
-      },
-      FurnaceSpeedSP: {
-        type: Number,
-      },
-      CoalSP: {
-        type: Number,
-      },
-      AlternativeCoalSP: {
-        type: Number,
-      },
-      FanSP: {
-        type: Number,
-      },
-      FurnaceSpeed: {
-        type: Number,
-      },
-      ActualFuel: {
-        type: Number,
-      },
-      AvgBZT: {
-        type: Number,
-      },
-      ActualFuelSP: {
-        type: Number,
-      },
-      HeatReplaceRatio: {
-        type: Number,
-      },
-      TotalHeatConsumption: {
-        type: Number,
-      },
-    },
     default: {},
   },
 
@@ -138,7 +89,7 @@ const schemaDefinition: SchemaDefinition = {
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**'],
+  saveUnknown: ['SensorData.*', 'Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
