@@ -45,6 +45,9 @@ export interface ISensorData {
     Hydraulic_Pressure?: number
     Conveyor_Flow_Rate_01?: number
     Conveyor_Flow_Rate_02?: number
+
+    CaO_f?: number
+    S03_hot_meal?: number
   }
   Prediction: null | {
     GeneralStatus?: string

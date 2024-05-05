@@ -65,22 +65,34 @@ export class DynamoDBStreamService {
           fifteenMinutesAgoSensorData.push(data?.SensorData || null)
         }
 
-        const response = await axios.post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        const [response1, response2] = await Promise.all([
+          axios
+            .post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((res) => res.data),
+          axios
+            .post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((res) => res.data),
+        ])
 
-        if (response.data) {
+        console.log('Response1: ', response1)
+        console.log('Response2: ', response2)
+
+        if (response1) {
           item.Prediction = {
-            GeneralStatus: response.data.status,
-            RecommendationActions: response.data.recommendation,
-            StatusInDetails: response.data.past_trend?.trend_info,
+            GeneralStatus: response1.status,
+            RecommendationActions: response1.recommendation,
+            StatusInDetails: response1.past_trend?.trend_info,
           }
-          item.Trending = response.data?.future_trend?.data ?? null
-          item.PastTrendData = response.data?.past_trend?.data ?? null
-
-          console.log('Success in getting trending', response.data)
+          item.Trending = response1.future_trend?.data ?? null
+          item.PastTrendData = response1.past_trend?.data ?? null
         }
       } catch (error) {
         console.log('Failed in getting trending', error)
@@ -176,6 +188,8 @@ export class DynamoDBStreamService {
           Hydraulic_Pressure: newRawSensorDataItem['Grate_Hyd_Pressure'],
           Conveyor_Flow_Rate_01: newRawSensorDataItem['_4C1BE01DRV01_M2001.Current.Value'],
           Conveyor_Flow_Rate_02: newRawSensorDataItem['_4C1BE01DRV02_M2001.Current.Value'],
+          CaO_f: newRawSensorDataItem['BP_KSCL_CL_CaOf'],
+          S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
         },
       }
 
