@@ -50,7 +50,7 @@ export class DynamoDBStreamService {
       try {
         const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
         const fifteenMinutesAgo: dayjs.Dayjs[] = []
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 60; i++) {
           fifteenMinutesAgo.push(nowDate.subtract(i, 'minute'))
         }
         const fifteenMinutesAgoDataResponse = await SensorData.model.batchGet(
@@ -113,7 +113,7 @@ export class DynamoDBStreamService {
         for (const [factoryId, wsConnections] of Object.entries(mapOfWSConnectionsByFactoryId)) {
           if (wsConnections.length > 0) {
             await executeConcurrently(wsConnections, 10, async (connections) => {
-              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 10 })
+              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 3 })
               await Promise.all(
                 connections.map((connection) =>
                   WebSocketService.postData({

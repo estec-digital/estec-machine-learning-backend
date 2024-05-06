@@ -48,6 +48,11 @@ export class DataService {
     return data
   }
 
+  public static async appDBGetDataForDashboard(params: IActionHandlerParams): Promise<Partial<ISensorData>[]> {
+    const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: params.authData.FactoryId, numberOfItems: 120 })
+    return data
+  }
+
   public static async appDBQueryData(params: IActionHandlerParams<Types.IAppDBQueryData>): Promise<QueryResponse<ISensorData>> {
     const queryParams = {
       FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
