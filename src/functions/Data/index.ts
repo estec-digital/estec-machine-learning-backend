@@ -14,7 +14,6 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     // AppDB
     this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
     this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['Date'])
-    this.restHandler.setAction('app_db__update_data', FunctionHandler.appDBUpdateData, ['Date', 'Time', 'ID'])
     this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
     this.restHandler.setAction('app_db__get_data_for_dashboard', FunctionHandler.appDBGetDataForDashboard, [])
 
@@ -23,10 +22,14 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [])
     this.restHandler.setAction('threshold__toggle_enable_alert', FunctionHandler.toggleEnableAlert, ['key', 'enableAlert'])
 
+    // Feedback
     this.restHandler.setAction('feedback__get_feedback_ticket', FunctionHandler.getFeedbackTicket, ['Date', 'Time'])
     this.restHandler.setAction('feedback__save_feedback', FunctionHandler.saveFeedback, ['Date', 'Time', 'Feedback'])
     this.restHandler.setAction('feedback_get_list', FunctionHandler.getListOfFeedbacks, ['From', 'To'])
     this.restHandler.setAction('feedback_get_item', FunctionHandler.getSingleFeedback, ['Date', 'Hash'])
+
+    // Issue
+    this.restHandler.setAction('issue__update_acknowledge', FunctionHandler.updateAcknowledge, ['Date', 'Time', 'ID'])
   }
 
   // RawDB
@@ -51,10 +54,6 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     return await DataService.appDBQueryData(params)
   }
 
-  private static async appDBUpdateData(params: IActionHandlerParams<DataServiceTypes.IAppDBUpdateData>) {
-    return await DataService.appDBUpdateData(params)
-  }
-
   private static async logsGetUploadUrl(params: IActionHandlerParams<S3ServiceTypes.Logs_GetUploadUrl>) {
     const s3Service = new S3Service()
     return await s3Service.logsGetUploadUrl(params.bodyPayload)
@@ -77,6 +76,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     return await DataService.toggleEnableAlert(params)
   }
 
+  // Feedback
   private static async getFeedbackTicket(params: IActionHandlerParams<DataServiceTypes.IGetFeedbackTicket>) {
     return await DataService.getFeedbackTicket(params)
   }
@@ -91,6 +91,11 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async getSingleFeedback(params: IActionHandlerParams<DataServiceTypes.IGetSingleFeedback>) {
     return await DataService.getSingleFeedback(params)
+  }
+
+  // Issue
+  private static async updateAcknowledge(params: IActionHandlerParams<DataServiceTypes.IIssueUpdateAcknowledge>) {
+    return await DataService.updateAcknowledge(params)
   }
 }
 

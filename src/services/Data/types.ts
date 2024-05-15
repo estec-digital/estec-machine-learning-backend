@@ -18,13 +18,13 @@ export interface IAppDBGetData {
   Time: ISensorData['Time']
 }
 
-export interface IAppDBUpdateData {
+export interface IIssueUpdateAcknowledge {
   Date: ISensorData['Date']
   Time: ISensorData['Time']
   ID: string
 }
 
-export interface IAppDBUpdateDataResponse {
+export interface IIssueUpdateAcknowledgeResponse {
   message: string
 }
 
