@@ -70,7 +70,7 @@ export class DataService {
     await data.save()
 
     return {
-      message: 'OK',
+      message: 'Update successfully',
     }
   }
 
