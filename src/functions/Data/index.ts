@@ -15,6 +15,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
     this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['Date'])
     this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
+    this.restHandler.setAction('app_db__get_data_for_dashboard', FunctionHandler.appDBGetDataForDashboard, [])
 
     // Threshold
     this.restHandler.setAction('threshold__get_data', FunctionHandler.getThreshold, [])
@@ -52,6 +53,10 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   private static async logsGetUploadUrl(params: IActionHandlerParams<S3ServiceTypes.Logs_GetUploadUrl>) {
     const s3Service = new S3Service()
     return await s3Service.logsGetUploadUrl(params.bodyPayload)
+  }
+
+  private static async appDBGetDataForDashboard(params: IActionHandlerParams) {
+    return await DataService.appDBGetDataForDashboard(params)
   }
 
   // Threshold

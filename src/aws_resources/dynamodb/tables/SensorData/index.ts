@@ -13,7 +13,7 @@ export interface ISensorData {
     // GA04_Oxi?: number
     KilnDriAmp?: number
     KilnInletTemp?: number
-    // Nox?: number
+    Nox?: number
     Pyrometer?: number
     MaterialTowerHeat?: number
     TowerOilTemp?: number
@@ -45,6 +45,9 @@ export interface ISensorData {
     Hydraulic_Pressure?: number
     Conveyor_Flow_Rate_01?: number
     Conveyor_Flow_Rate_02?: number
+
+    CaO_f?: number
+    S03_hot_meal?: number
   }
   Prediction: null | {
     GeneralStatus?: string
@@ -57,6 +60,7 @@ export interface ISensorData {
   }
   PastTrendData: Partial<ISensorData['SensorData'] | null>[]
   Trending: Partial<ISensorData['SensorData'] | null>[]
+  Issues: {}[]
 }
 
 export enum ESensorDataIndexes {}
@@ -89,7 +93,7 @@ const schemaDefinition: SchemaDefinition = {
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['SensorData.*', 'Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**'],
+  saveUnknown: ['SensorData.*', 'Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**', 'Issues.*', 'Issues.**'],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },

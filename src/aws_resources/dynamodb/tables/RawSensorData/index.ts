@@ -48,6 +48,9 @@ export interface IRawSensorData {
   '_4C1BE01DRV01_M2001.Current.Value'?: number
   '_4C1BE01DRV02_M2001.Current.Value'?: number
 
+  BP_KSCL_CL_CaOf?: number
+  BP_KSCL_CL_SO3?: number
+
   note: {
     triggedFnProcessDataToAppDB: boolean
   }
