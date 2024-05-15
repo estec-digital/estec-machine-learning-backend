@@ -14,6 +14,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     // AppDB
     this.restHandler.setAction('app_db__get_data', FunctionHandler.appDBGetData, ['Date', 'Time'])
     this.restHandler.setAction('app_db__query_data', FunctionHandler.appDBQueryData, ['Date'])
+    this.restHandler.setAction('app_db__update_data', FunctionHandler.appDBUpdateData, ['Date', 'Time', 'ID'])
     this.restHandler.setAction('logs__get_upload_url', FunctionHandler.logsGetUploadUrl, ['Folder'])
     this.restHandler.setAction('app_db__get_data_for_dashboard', FunctionHandler.appDBGetDataForDashboard, [])
 
@@ -48,6 +49,10 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async appDBQueryData(params: IActionHandlerParams<DataServiceTypes.IAppDBQueryData>) {
     return await DataService.appDBQueryData(params)
+  }
+
+  private static async appDBUpdateData(params: IActionHandlerParams<DataServiceTypes.IAppDBUpdateData>) {
+    return await DataService.appDBUpdateData(params)
   }
 
   private static async logsGetUploadUrl(params: IActionHandlerParams<S3ServiceTypes.Logs_GetUploadUrl>) {

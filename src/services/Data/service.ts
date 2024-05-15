@@ -48,6 +48,32 @@ export class DataService {
     return data
   }
 
+  public static async appDBUpdateData(params: IActionHandlerParams<Types.IAppDBUpdateData>): Promise<Types.IAppDBUpdateDataResponse> {
+    const data = await SensorData.model.get({
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+      Time: params.bodyPayload.Time,
+    })
+
+    if (!data) {
+      throw new Error('Failed to update')
+    }
+
+    if (data && data.Issues && data.Issues.length > 0) {
+      const foundIssue = data.Issues.find((item) => item.ID === params.bodyPayload.ID)
+      if (foundIssue) {
+        foundIssue.Acknowledge = true
+      } else {
+        throw new Error('Nothing to update!!!')
+      }
+    }
+
+    await data.save()
+
+    return {
+      message: 'OK',
+    }
+  }
+
   public static async appDBGetDataForDashboard(params: IActionHandlerParams): Promise<Partial<ISensorData>[]> {
     const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: params.authData.FactoryId, numberOfItems: 120 })
     return data

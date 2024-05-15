@@ -18,6 +18,16 @@ export interface IAppDBGetData {
   Time: ISensorData['Time']
 }
 
+export interface IAppDBUpdateData {
+  Date: ISensorData['Date']
+  Time: ISensorData['Time']
+  ID: string
+}
+
+export interface IAppDBUpdateDataResponse {
+  message: string
+}
+
 export interface IAppDBQueryData {
   Date: string
   Time?: string
