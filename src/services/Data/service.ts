@@ -224,6 +224,7 @@ export class DataService {
 
     return {
       message: 'Update successfully',
+      updateData: data,
     }
   }
 }

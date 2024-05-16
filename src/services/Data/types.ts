@@ -26,6 +26,7 @@ export interface IIssueUpdateAcknowledge {
 
 export interface IIssueUpdateAcknowledgeResponse {
   message: string
+  updateData: ISensorData
 }
 
 export interface IAppDBQueryData {
