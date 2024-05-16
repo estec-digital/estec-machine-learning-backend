@@ -216,6 +216,8 @@ export class DataService {
       } else {
         throw new Error('Nothing to update!!!')
       }
+    } else {
+      throw new Error('Not found Issue to update!!!')
     }
 
     await data.save()
