@@ -22,10 +22,14 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     this.restHandler.setAction('threshold__update_data', FunctionHandler.updateThreshold, [])
     this.restHandler.setAction('threshold__toggle_enable_alert', FunctionHandler.toggleEnableAlert, ['key', 'enableAlert'])
 
+    // Feedback
     this.restHandler.setAction('feedback__get_feedback_ticket', FunctionHandler.getFeedbackTicket, ['Date', 'Time'])
     this.restHandler.setAction('feedback__save_feedback', FunctionHandler.saveFeedback, ['Date', 'Time', 'Feedback'])
     this.restHandler.setAction('feedback_get_list', FunctionHandler.getListOfFeedbacks, ['From', 'To'])
     this.restHandler.setAction('feedback_get_item', FunctionHandler.getSingleFeedback, ['Date', 'Hash'])
+
+    // Issue
+    this.restHandler.setAction('issue__update_acknowledge', FunctionHandler.updateAcknowledge, ['Date', 'Time', 'ID'])
   }
 
   // RawDB
@@ -72,6 +76,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     return await DataService.toggleEnableAlert(params)
   }
 
+  // Feedback
   private static async getFeedbackTicket(params: IActionHandlerParams<DataServiceTypes.IGetFeedbackTicket>) {
     return await DataService.getFeedbackTicket(params)
   }
@@ -86,6 +91,11 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async getSingleFeedback(params: IActionHandlerParams<DataServiceTypes.IGetSingleFeedback>) {
     return await DataService.getSingleFeedback(params)
+  }
+
+  // Issue
+  private static async updateAcknowledge(params: IActionHandlerParams<DataServiceTypes.IIssueUpdateAcknowledge>) {
+    return await DataService.updateAcknowledge(params)
   }
 }
 

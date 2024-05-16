@@ -60,7 +60,15 @@ export interface ISensorData {
   }
   PastTrendData: Partial<ISensorData['SensorData'] | null>[]
   Trending: Partial<ISensorData['SensorData'] | null>[]
-  Issues: {}[]
+  Issues: {
+    Date: string
+    Acknowledge: boolean
+    ID: string
+    IssueType: number
+    Rules: null | []
+    Sources: null | []
+    Warning: string
+  }[]
 }
 
 export enum ESensorDataIndexes {}
