@@ -8,29 +8,11 @@ import { IDynamoDBRecord } from '~core/dynamoose/types'
 import { ISensorDataStreamData } from '~functions/DynamoDBStream/types'
 import { DataService } from '~services/Data'
 import { WebSocketService } from '~services/WebSocket'
-import { getBatches } from '~shared/utils'
 
 export class DynamoDBStreamService {
   public static async handleConnectionInsertionStream(record: IDynamoDBRecord<IWebSocketConnection>) {
-    const newWSConnectionItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IWebSocketConnection
-    const connectionId = newWSConnectionItem.ConnectionId
-    if (connectionId) {
-      const totalItems = 120
-      const batches = getBatches(totalItems, 30)
-      const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: newWSConnectionItem.FactoryId, numberOfItems: totalItems })
-      let totalSent = 0
-      for (const batchSize of batches) {
-        await WebSocketService.postData({
-          type: 'POST_TO_SINGLE_CONNECTION',
-          connectionId,
-          data: async (): Promise<ISensorDataStreamData> => ({
-            type: 'SENSOR_DATA__LAST_ITEMS',
-            data: data.slice(totalSent, totalSent + batchSize),
-          }),
-        })
-        totalSent += batchSize
-      }
-    }
+    // On a new connection connect to the system
+    return true
   }
 
   public static async handleSensorDataStream(record: IDynamoDBRecord<ISensorData>) {
@@ -50,7 +32,7 @@ export class DynamoDBStreamService {
       try {
         const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
         const fifteenMinutesAgo: dayjs.Dayjs[] = []
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 60; i++) {
           fifteenMinutesAgo.push(nowDate.subtract(i, 'minute'))
         }
         const fifteenMinutesAgoDataResponse = await SensorData.model.batchGet(
@@ -65,30 +47,43 @@ export class DynamoDBStreamService {
           fifteenMinutesAgoSensorData.push(data?.SensorData || null)
         }
 
-        const response = await axios.post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+        const [response1, response2] = await Promise.all([
+          axios
+            .post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((res) => res.data),
+          axios
+            .post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((res) => res.data),
+        ])
 
-        if (response.data) {
+        console.log('Response1: ', response1)
+        console.log('Response2: ', response2)
+
+        if (response1) {
           item.Prediction = {
-            GeneralStatus: response.data.status,
-            RecommendationActions: response.data.recommendation,
-            StatusInDetails: response.data.past_trend?.trend_info,
+            GeneralStatus: response1.status,
+            RecommendationActions: response1.recommendation,
+            StatusInDetails: response1.past_trend?.trend_info,
           }
-          item.Trending = response.data?.future_trend?.data ?? null
-          item.PastTrendData = response.data?.past_trend?.data ?? null
-
-          console.log('Success in getting trending', response.data)
+          item.Trending = response1.future_trend?.data ?? null
+          item.PastTrendData = response1.past_trend?.data ?? null
+          item.Issues = response2
         }
       } catch (error) {
         console.log('Failed in getting trending', error)
       }
 
+      console.log('Final item before save:', item)
       await item.save()
-
-      console.log('Final item:', item)
+      console.log('Final item after save:', item)
     } else {
       if (timeOfSensorData.isValid() && Math.abs(now.diff(timeOfSensorData, 'second')) <= 60 * 15) {
         const allActiveWSConnections = await WebSocketConnection.model.query({ FactoryId: item.FactoryId }).using(EWebSocketConnectionIndexes.GSI_FactoryId).exec()
@@ -101,7 +96,7 @@ export class DynamoDBStreamService {
         for (const [factoryId, wsConnections] of Object.entries(mapOfWSConnectionsByFactoryId)) {
           if (wsConnections.length > 0) {
             await executeConcurrently(wsConnections, 10, async (connections) => {
-              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 10 })
+              const data = await DataService.appDBQueryLastItemsOfSensorData({ factoryId: factoryId, numberOfItems: 1 })
               await Promise.all(
                 connections.map((connection) =>
                   WebSocketService.postData({
@@ -144,7 +139,7 @@ export class DynamoDBStreamService {
           // GA04_Oxi: newRawSensorDataItem['4G1GA04XAC01_O2_AVG'],
           KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
           KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
-          // Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
+          Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
           Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
           MaterialTowerHeat: newRawSensorDataItem['_G1PJ01MCH02T8201_TIA_IO_Signal_Value'],
           TowerOilTemp: newRawSensorDataItem['4G1PS01GPJ02_T8201_AVG'],
@@ -176,6 +171,8 @@ export class DynamoDBStreamService {
           Hydraulic_Pressure: newRawSensorDataItem['Grate_Hyd_Pressure'],
           Conveyor_Flow_Rate_01: newRawSensorDataItem['_4C1BE01DRV01_M2001.Current.Value'],
           Conveyor_Flow_Rate_02: newRawSensorDataItem['_4C1BE01DRV02_M2001.Current.Value'],
+          CaO_f: newRawSensorDataItem['BP_KSCL_CL_CaOf'],
+          S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
         },
       }
 
