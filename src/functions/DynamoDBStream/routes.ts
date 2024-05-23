@@ -3,7 +3,7 @@ import { handlerPath } from '~core/lambda/handler-resolver'
 
 const LambdaFunctionConfigs: AWS['functions'][any] = {
   handler: `${handlerPath(__dirname)}/index.main`,
-  memorySize: 1024,
+  memorySize: 2048,
   timeout: 60,
   events: [
     {
