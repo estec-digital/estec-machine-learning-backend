@@ -38,9 +38,9 @@ const serverlessConfiguration: AWS = {
     stage: process.env.STAGE ?? '${opt:stage, "alpha"}',
 
     // AWS Lambda configs
-    runtime: 'nodejs16.x',
-    timeout: 10,
-    memorySize: 1024,
+    runtime: 'nodejs18.x',
+    timeout: 15,
+    memorySize: 2048,
 
     // vpc: {
     //   securityGroupIds: JSON.parse(process.env.SECURITY_GROUP_IDS ?? '[]'),
