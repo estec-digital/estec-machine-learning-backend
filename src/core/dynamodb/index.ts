@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import * as dynamoose from 'dynamoose'
 import { Item } from 'dynamoose/dist/Item'
 import * as lodash from 'lodash'
@@ -117,11 +117,11 @@ export class DynamoDBTable<TableInterface, EnumIndexes = any> {
     }
 
     if (hashKey) {
-      insertToAttributeDefinitions({ AttributeName: hashKey, AttributeType: this.dynamooseSchema.getAttributeType(hashKey) as string })
+      insertToAttributeDefinitions({ AttributeName: hashKey, AttributeType: this.dynamooseSchema.getAttributeType(hashKey) as DynamoDB.ScalarAttributeType })
       insertToKeySchema({ AttributeName: hashKey, KeyType: 'HASH' })
     }
     if (rangeKey) {
-      insertToAttributeDefinitions({ AttributeName: rangeKey, AttributeType: this.dynamooseSchema.getAttributeType(rangeKey) as string })
+      insertToAttributeDefinitions({ AttributeName: rangeKey, AttributeType: this.dynamooseSchema.getAttributeType(rangeKey) as DynamoDB.ScalarAttributeType })
       insertToKeySchema({ AttributeName: rangeKey, KeyType: 'RANGE' })
     }
 
@@ -195,7 +195,7 @@ export class DynamoDBTable<TableInterface, EnumIndexes = any> {
         for (const keySchema of lsi.keySchema) {
           insertToAttributeDefinitions({
             AttributeName: String(keySchema.attributeName),
-            AttributeType: this.dynamooseSchema.getAttributeType(String(keySchema.attributeName)) as string,
+            AttributeType: this.dynamooseSchema.getAttributeType(String(keySchema.attributeName)) as DynamoDB.ScalarAttributeType,
           })
         }
       }
@@ -208,7 +208,7 @@ export class DynamoDBTable<TableInterface, EnumIndexes = any> {
         for (const keySchema of gsi.keySchema) {
           insertToAttributeDefinitions({
             AttributeName: String(keySchema.attributeName),
-            AttributeType: this.dynamooseSchema.getAttributeType(String(keySchema.attributeName)) as string,
+            AttributeType: this.dynamooseSchema.getAttributeType(String(keySchema.attributeName)) as DynamoDB.ScalarAttributeType,
           })
         }
       }

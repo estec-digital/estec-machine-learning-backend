@@ -1,10 +1,10 @@
+import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi'
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
 import { WebSocketConnection } from '~aws_resources/dynamodb/tables'
 import { TJwtAuthUserInfo } from '~services/Auth/types'
 import * as Types from './types'
 
-const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
+const apiGatewayManagementApi = new ApiGatewayManagementApiClient({
   apiVersion: '2018-11-29',
   endpoint: process.env.WEBSOCKET_HTTPS_ENDPOINT,
 })
@@ -34,10 +34,6 @@ export class WebSocketService {
     return 123
   }
 
-  public static getAPIGatewayManagementApiInstance() {
-    return apiGatewayManagementApi
-  }
-
   private static async handlePostFailed(connectionId: string, error: any) {
     await WebSocketConnection.model.delete({ ConnectionId: connectionId })
     if (error.statusCode === 410 || error.statusCode === 404) {
@@ -54,9 +50,12 @@ export class WebSocketService {
           const data = await params.data()
           console.log({ POST_TO_SINGLE_CONNECTION: { connectionId: params.connectionId, data } })
           try {
-            await WebSocketService.getAPIGatewayManagementApiInstance()
-              .postToConnection({ ConnectionId: params.connectionId, Data: JSON.stringify(data) })
-              .promise()
+            await apiGatewayManagementApi.send(
+              new PostToConnectionCommand({
+                ConnectionId: params.connectionId,
+                Data: JSON.stringify(data),
+              }),
+            )
           } catch (error) {
             await WebSocketConnection.model.delete({ ConnectionId: params.connectionId })
             if (error.statusCode === 410 || error.statusCode === 404) {
@@ -73,9 +72,7 @@ export class WebSocketService {
           const data = await params.data()
           for (const connection of connections) {
             try {
-              await WebSocketService.getAPIGatewayManagementApiInstance()
-                .postToConnection({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(data) })
-                .promise()
+              await apiGatewayManagementApi.send(new PostToConnectionCommand({ ConnectionId: connection.ConnectionId, Data: JSON.stringify(data) }))
             } catch (error) {
               await this.handlePostFailed(connection.ConnectionId, error)
             }

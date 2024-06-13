@@ -38,7 +38,7 @@ const serverlessConfiguration: AWS = {
     stage: process.env.STAGE ?? '${opt:stage, "alpha"}',
 
     // AWS Lambda configs
-    runtime: 'nodejs18.x',
+    runtime: 'nodejs20.x',
     timeout: 15,
     memorySize: 2048,
 
@@ -103,14 +103,14 @@ const serverlessConfiguration: AWS = {
   custom: {
     esbuild: {
       bundle: true,
-      minify: false,
-      sourcemap: true,
-      exclude: ['aws-sdk'],
-      target: 'node16',
-      define: { 'require.resolve': undefined },
+      minify: true,
+      exclude: ['aws-sdk', '@aws-sdk/*', '@esbuild'],
+      packager: 'yarn',
+      target: 'node20',
       platform: 'node',
-      concurrency: 10,
+      concurrency: 16,
     },
+
     logRetentionInDays: {
       prod: 90,
       dev: 7,
