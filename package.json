@@ -50,8 +50,8 @@
     "@types/md5": "^2.3.2",
     "@types/node": "^14.14.25",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.47.1",
-    "@typescript-eslint/parser": "^5.47.1",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "aws-sdk": "^2.1642.0",
     "babel-jest": "^29.3.1",
     "babel-plugin-module-resolver": "^5.0.0",
@@ -65,9 +65,9 @@
     "prettier": "^2.8.1",
     "serverless-esbuild": "^1.46.0",
     "serverless-offline": "^10.0.1",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.4.0",
-    "tsconfig-paths": "^3.9.0"
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0"
   },
   "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
   "license": "MIT"
