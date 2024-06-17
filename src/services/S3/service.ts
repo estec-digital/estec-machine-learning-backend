@@ -1,13 +1,11 @@
-import * as AWS from 'aws-sdk'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+
 import dayjs from 'dayjs'
 import { S3ServiceTypes } from '.'
 
 export class S3Service {
-  private s3: AWS.S3
-
-  constructor() {
-    this.s3 = new AWS.S3({ signatureVersion: 'v4' })
-  }
+  private s3Client = new S3Client({})
 
   async logsGetUploadUrl(params: S3ServiceTypes.Logs_GetUploadUrl) {
     const bucketName = process.env.S3_PRIVATE_BUCKET_NAME
@@ -17,13 +15,12 @@ export class S3Service {
       fileKey = `${params.Folder}${fileKey}`
     }
 
-    const uploadParams = {
+    const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: fileKey,
-      Expires: 600, // URL will be expired in 10mins
       ContentType: '*',
-    }
+    })
 
-    return await this.s3.getSignedUrlPromise('putObject', uploadParams)
+    return getSignedUrl(this.s3Client as any, command as any, { expiresIn: 3600 })
   }
 }

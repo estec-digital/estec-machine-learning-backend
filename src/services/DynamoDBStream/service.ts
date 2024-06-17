@@ -1,4 +1,4 @@
-import { DynamoDB } from 'aws-sdk'
+import { unmarshall } from '@aws-sdk/util-dynamodb'
 import axios from 'axios'
 import dayjs from 'dayjs'
 import { IRawSensorData, ISensorData, RawSensorData, SensorData } from '~aws_resources/dynamodb/tables/'
@@ -16,7 +16,7 @@ export class DynamoDBStreamService {
   }
 
   public static async handleSensorDataStream(record: IDynamoDBRecord<ISensorData>) {
-    const newSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as ISensorData
+    const newSensorDataItem = unmarshall(record.dynamodb.NewImage as any) as ISensorData
 
     const item = await SensorData.model.get({ FactoryId_Date: newSensorDataItem.FactoryId_Date, Time: newSensorDataItem.Time })
 
@@ -118,7 +118,7 @@ export class DynamoDBStreamService {
   }
 
   public static async handleRawSensorDataStream(record: IDynamoDBRecord<IRawSensorData>) {
-    const newRawSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IRawSensorData
+    const newRawSensorDataItem = unmarshall(record.dynamodb.NewImage as any) as IRawSensorData
 
     const rawSensorData = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
     if (!rawSensorData) return
