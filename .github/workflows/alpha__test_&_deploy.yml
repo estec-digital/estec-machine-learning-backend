@@ -50,7 +50,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::617443366113:role/GithubActionsDeploymentRole
           aws-region: ap-southeast-1
