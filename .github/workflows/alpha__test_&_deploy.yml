@@ -70,4 +70,4 @@ jobs:
           echo GCP_CREDENTIALS_BASE64='"${{ secrets.ALPHA__GCP_CREDENTIALS_BASE64 }}"' >> .env
       - name: Run Serverless deploy
         run: |
-          serverless deploy --stage ${{ env.STAGE }} --force
+          yarn deploy --stage ${{ env.STAGE }} --force
