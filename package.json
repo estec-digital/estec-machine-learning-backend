@@ -2,7 +2,6 @@
   "name": "estec-backend",
   "version": "1.0.0",
   "description": "Serverless aws-nodejs-typescript template",
-  "main": "serverless.ts",
   "scripts": {
     "test": "jest",
     "test-unit": "jest --testPathPattern=\"unit\"",
@@ -11,7 +10,7 @@
     "dev": "sls offline start"
   },
   "engines": {
-    "node": ">=14.15.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.598.0",
