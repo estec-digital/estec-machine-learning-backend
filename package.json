@@ -7,7 +7,8 @@
     "test-unit": "jest --testPathPattern=\"unit\"",
     "test-integration": "jest --testPathPattern=\"integration\"",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "dev": "sls offline start"
+    "dev": "sls offline start",
+    "deploy": "serverless deploy"
   },
   "engines": {
     "node": ">=18.0.0"
