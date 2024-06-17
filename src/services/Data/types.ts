@@ -49,6 +49,13 @@ export type IToggleEnableAlert = {
   enableAlert: boolean
 }
 
+export type IGetListOfIssues = {
+  Date: string
+  Time: string
+  sort?: SortOrder
+  limit?: number
+}
+
 export type IGetFeedbackTicket = {
   Date: string
   Time: string

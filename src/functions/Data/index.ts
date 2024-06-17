@@ -30,6 +30,7 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
     // Issue
     this.restHandler.setAction('issue__update_acknowledge', FunctionHandler.updateAcknowledge, ['Date', 'Time', 'ID'])
+    this.restHandler.setAction('issue_get_list', FunctionHandler.getListOfIssues, ['Date', 'Time'])
   }
 
   // RawDB
@@ -96,6 +97,10 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
   // Issue
   private static async updateAcknowledge(params: IActionHandlerParams<DataServiceTypes.IIssueUpdateAcknowledge>) {
     return await DataService.updateAcknowledge(params)
+  }
+
+  private static async getListOfIssues(params: IActionHandlerParams<DataServiceTypes.IGetListOfIssues>) {
+    return await DataService.getListOfIssues(params)
   }
 }
 

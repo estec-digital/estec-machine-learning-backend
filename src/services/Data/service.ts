@@ -71,6 +71,24 @@ export class DataService {
     return data
   }
 
+  public static async getListOfIssues(params: IActionHandlerParams<Types.IGetListOfIssues>): Promise<ISensorData[]> {
+    const queryParams = {
+      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+    }
+    if (params.bodyPayload.Time) {
+      queryParams['Time'] = params.bodyPayload.Time
+    }
+    let query = SensorData.model.query(queryParams).attribute('Issues')
+    if (params.bodyPayload.sort) {
+      query = query.sort(params.bodyPayload.sort)
+    }
+    if (params.bodyPayload.limit) {
+      query = query.limit(params.bodyPayload.limit)
+    }
+    const data = await query.exec()
+    return data
+  }
+
   public static async appDBQueryLastItemsOfSensorData(params: { numberOfItems: number; factoryId: string }): Promise<Partial<ISensorData>[]> {
     const now = dayjs()
     const arrItems = await SensorData.model
