@@ -173,6 +173,7 @@ export class DynamoDBStreamService {
           Conveyor_Flow_Rate_02: newRawSensorDataItem['_4C1BE01DRV02_M2001.Current.Value'],
           CaO_f: newRawSensorDataItem['BP_KSCL_CL_CaOf'],
           S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
+          Conveyor_Flow: newRawSensorDataItem['4C1BE01DRV01_M2001_I'],
         },
       }
 
