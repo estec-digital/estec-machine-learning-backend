@@ -31,6 +31,9 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
     // Issue
     this.restHandler.setAction('issue__update_acknowledge', FunctionHandler.updateAcknowledge, ['Date', 'Time', 'ID'])
     this.restHandler.setAction('issue_get_list', FunctionHandler.getListOfIssues, ['Date', 'Time'])
+
+    // Cache
+    this.restHandler.setAction('cache__get_data', FunctionHandler.cacheGetData, ['key'])
   }
 
   // RawDB
@@ -101,6 +104,11 @@ class FunctionHandler extends RestHandler<Types.TAllowAction>() {
 
   private static async getListOfIssues(params: IActionHandlerParams<DataServiceTypes.IGetListOfIssues>) {
     return await DataService.getListOfIssues(params)
+  }
+
+  // Cache
+  private static async cacheGetData(params: IActionHandlerParams<DataServiceTypes.ICacheGetData>) {
+    return await DataService.cacheGetData(params)
   }
 }
 

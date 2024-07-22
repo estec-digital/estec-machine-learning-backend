@@ -1,5 +1,6 @@
 import { SortOrder } from 'dynamoose/dist/General'
 import { IFactory, ISensorData, ISensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { CACHE_SORT_KEY } from '~aws_resources/dynamodb/tables/Cache/types'
 
 export interface IRawDBGetData {
   Date: ISensorData['Date']
@@ -75,4 +76,8 @@ export type IGetListOfFeedbacks = {
 export type IGetSingleFeedback = {
   Date: string
   Hash: string
+}
+
+export type ICacheGetData = {
+  key: CACHE_SORT_KEY
 }

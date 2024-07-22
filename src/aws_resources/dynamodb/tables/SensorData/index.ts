@@ -70,6 +70,11 @@ export interface ISensorData {
     Rules: null | []
     Sources: null | []
     Warning: string
+    SensorDataInfo: {
+      FactoryId: ISensorData['FactoryId']
+      Date: ISensorData['Date']
+      Time: ISensorData['Time']
+    }
   }[]
 }
 
