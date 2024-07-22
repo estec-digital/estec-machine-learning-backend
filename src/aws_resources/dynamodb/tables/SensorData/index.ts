@@ -48,6 +48,8 @@ export interface ISensorData {
 
     CaO_f?: number
     S03_hot_meal?: number
+
+    Conveyor_Flow?: number
   }
   Prediction: null | {
     GeneralStatus?: string
