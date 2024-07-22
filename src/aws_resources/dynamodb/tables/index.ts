@@ -1,3 +1,4 @@
+export * from './Cache'
 export * from './Factory'
 export * from './RawSensorData'
 export * from './SensorData'
