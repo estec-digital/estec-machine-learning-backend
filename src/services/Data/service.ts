@@ -2,7 +2,8 @@ import dayjs from 'dayjs'
 import { QueryResponse } from 'dynamoose/dist/ItemRetriever'
 import * as lodash from 'lodash'
 import { getPartitionKey_SensorData } from '~aws_resources/dynamodb/middlewares'
-import { Factory, IFactory, IRawSensorData, ISensorData, ISensorDataFeedback, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { Cache, Factory, ICache, IFactory, IRawSensorData, ISensorData, ISensorDataFeedback, RawSensorData, SensorData, SensorDataFeedback } from '~aws_resources/dynamodb/tables/'
+import { CACHE_SORT_KEY } from '~aws_resources/dynamodb/tables/Cache/types'
 import { IActionHandlerParams } from '~core/rest-handler/RestHandler'
 import * as Types from './types'
 
@@ -222,6 +223,31 @@ export class DataService {
 
     await data.save()
 
+    // Find in cache and update
+    const lastSensorDataIssues = await Cache.model.get({
+      FactoryId: params.authData.FactoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+    })
+    if (lastSensorDataIssues) {
+      try {
+        const lastIssuesInDB = JSON.parse(lastSensorDataIssues.Data)
+        if (Array.isArray(lastIssuesInDB)) {
+          for (const item of lastIssuesInDB) {
+            if (item.ID === params.bodyPayload.ID) {
+              item.Acknowledge = true
+            }
+          }
+          await Cache.model.update({
+            FactoryId: params.authData.FactoryId,
+            CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+            Data: JSON.stringify(lastIssuesInDB),
+          })
+        }
+      } catch (error) {
+        console.log('error', error)
+      }
+    }
+
     return {
       message: 'Update successfully',
       updateData: data,
@@ -243,6 +269,15 @@ export class DataService {
       query = query.limit(params.bodyPayload.limit)
     }
     const data = await query.exec()
+    return data
+  }
+
+  // Cache
+  public static async cacheGetData(params: IActionHandlerParams<Types.ICacheGetData>): Promise<ICache> {
+    const data = await Cache.model.get({
+      FactoryId: params.authData.FactoryId,
+      CacheKey: params.bodyPayload.key,
+    })
     return data
   }
 }

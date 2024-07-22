@@ -53,27 +53,28 @@ export class DynamoDBStreamService {
         let response2: SensorDataIssue[]
 
         try {
-          response1 =await axios.post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }).then((res) => res.data)
+          response1 = await axios
+            .post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((res) => res.data)
         } catch (error) {
           console.log('Failed in getting prediction', error)
         }
 
         try {
-          response2 = await axios.post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }).then((res) => res.data)
-
-
+          response2 = await axios
+            .post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+            .then((res) => res.data)
         } catch (error) {
           console.log('Failed in getting issues', error)
         }
-
 
         console.log('Response1: ', response1)
         console.log('Response2: ', response2)
@@ -86,11 +87,21 @@ export class DynamoDBStreamService {
           }
           item.Trending = response1.future_trend?.data ?? null
           item.PastTrendData = response1.past_trend?.data ?? null
-          item.Issues = response2
 
-          await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, response2 ?? [])
+          if (Array.isArray(response2) && response2.length > 0) {
+            response2 = response2.map((issue) => ({
+              ...issue,
+              SensorDataInfo: {
+                FactoryId: item.FactoryId,
+                Date: item.Date,
+                Time: item.Time,
+              },
+            }))
+
+            item.Issues = response2
+            await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, response2 ?? [])
+          }
         }
-
       } catch (error) {
         console.log('Failed in getting trending', error)
       }
@@ -202,21 +213,19 @@ export class DynamoDBStreamService {
     return
   }
 
-
   private static async updateLastSensorDataIssues(factoryId: string, issues: SensorDataIssue[]) {
-
     if (!(Array.isArray(issues) && issues.length > 0)) {
       return false
     }
 
     const lastSensorDataIssues = await Cache.model.get({
       FactoryId: factoryId,
-      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
     })
 
     issues = issues.map((issue) => ({
       ...issue,
-      BEUpdatedAt: dayjs().toISOString()
+      Acknowledge: false,
     }))
 
     let lastIssuesInDB: SensorDataIssue[] = []
@@ -233,7 +242,7 @@ export class DynamoDBStreamService {
         await Cache.model.update({
           FactoryId: factoryId,
           CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
-          Data: JSON.stringify(lastIssuesInDB)
+          Data: JSON.stringify(lastIssuesInDB),
         })
         return true
       } catch (error) {
@@ -247,7 +256,7 @@ export class DynamoDBStreamService {
     await Cache.model.create({
       FactoryId: factoryId,
       CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
-      Data: JSON.stringify(lastIssuesInDB)
+      Data: JSON.stringify(lastIssuesInDB),
     })
     return true
   }
