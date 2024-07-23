@@ -48,6 +48,8 @@ export interface ISensorData {
 
     CaO_f?: number
     S03_hot_meal?: number
+
+    Conveyor_Flow?: number
   }
   Prediction: null | {
     GeneralStatus?: string
@@ -68,6 +70,11 @@ export interface ISensorData {
     Rules: null | []
     Sources: null | []
     Warning: string
+    SensorDataInfo: {
+      FactoryId: ISensorData['FactoryId']
+      Date: ISensorData['Date']
+      Time: ISensorData['Time']
+    }
   }[]
 }
 

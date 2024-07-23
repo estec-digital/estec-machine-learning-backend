@@ -1,13 +1,15 @@
-import { DynamoDB } from 'aws-sdk'
+import { unmarshall } from '@aws-sdk/util-dynamodb'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import { IRawSensorData, ISensorData, RawSensorData, SensorData } from '~aws_resources/dynamodb/tables/'
+import { Cache, IRawSensorData, ISensorData, RawSensorData, SensorData } from '~aws_resources/dynamodb/tables/'
+import { CACHE_SORT_KEY } from '~aws_resources/dynamodb/tables/Cache/types'
 import { EWebSocketConnectionIndexes, IWebSocketConnection, WebSocketConnection } from '~aws_resources/dynamodb/tables/WebSocketConnection'
 import { executeConcurrently } from '~core/dynamoose/model'
 import { IDynamoDBRecord } from '~core/dynamoose/types'
 import { ISensorDataStreamData } from '~functions/DynamoDBStream/types'
 import { DataService } from '~services/Data'
 import { WebSocketService } from '~services/WebSocket'
+import { SensorDataIssue } from './types'
 
 export class DynamoDBStreamService {
   public static async handleConnectionInsertionStream(record: IDynamoDBRecord<IWebSocketConnection>) {
@@ -16,7 +18,7 @@ export class DynamoDBStreamService {
   }
 
   public static async handleSensorDataStream(record: IDynamoDBRecord<ISensorData>) {
-    const newSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as ISensorData
+    const newSensorDataItem = unmarshall(record.dynamodb.NewImage as any) as ISensorData
 
     const item = await SensorData.model.get({ FactoryId_Date: newSensorDataItem.FactoryId_Date, Time: newSensorDataItem.Time })
 
@@ -47,22 +49,32 @@ export class DynamoDBStreamService {
           fifteenMinutesAgoSensorData.push(data?.SensorData || null)
         }
 
-        const [response1, response2] = await Promise.all([
-          axios
+        let response1
+        let response2: SensorDataIssue[]
+
+        try {
+          response1 = await axios
             .post(`${process.env.AI_BASE_URL}/classify_status_predict_trend`, fifteenMinutesAgoSensorData, {
               headers: {
                 'Content-Type': 'application/json',
               },
             })
-            .then((res) => res.data),
-          axios
+            .then((res) => res.data)
+        } catch (error) {
+          console.log('Failed in getting prediction', error)
+        }
+
+        try {
+          response2 = await axios
             .post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
               headers: {
                 'Content-Type': 'application/json',
               },
             })
-            .then((res) => res.data),
-        ])
+            .then((res) => res.data)
+        } catch (error) {
+          console.log('Failed in getting issues', error)
+        }
 
         console.log('Response1: ', response1)
         console.log('Response2: ', response2)
@@ -75,7 +87,20 @@ export class DynamoDBStreamService {
           }
           item.Trending = response1.future_trend?.data ?? null
           item.PastTrendData = response1.past_trend?.data ?? null
-          item.Issues = response2
+
+          if (Array.isArray(response2) && response2.length > 0) {
+            response2 = response2.map((issue) => ({
+              ...issue,
+              SensorDataInfo: {
+                FactoryId: item.FactoryId,
+                Date: item.Date,
+                Time: item.Time,
+              },
+            }))
+
+            item.Issues = response2
+            await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, response2 ?? [])
+          }
         }
       } catch (error) {
         console.log('Failed in getting trending', error)
@@ -118,7 +143,7 @@ export class DynamoDBStreamService {
   }
 
   public static async handleRawSensorDataStream(record: IDynamoDBRecord<IRawSensorData>) {
-    const newRawSensorDataItem = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage) as IRawSensorData
+    const newRawSensorDataItem = unmarshall(record.dynamodb.NewImage as any) as IRawSensorData
 
     const rawSensorData = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
     if (!rawSensorData) return
@@ -173,6 +198,7 @@ export class DynamoDBStreamService {
           Conveyor_Flow_Rate_02: newRawSensorDataItem['_4C1BE01DRV02_M2001.Current.Value'],
           CaO_f: newRawSensorDataItem['BP_KSCL_CL_CaOf'],
           S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
+          Conveyor_Flow: newRawSensorDataItem['4C1BE01DRV01_M2001_I'],
         },
       }
 
@@ -185,5 +211,53 @@ export class DynamoDBStreamService {
     }
 
     return
+  }
+
+  private static async updateLastSensorDataIssues(factoryId: string, issues: SensorDataIssue[]) {
+    if (!(Array.isArray(issues) && issues.length > 0)) {
+      return false
+    }
+
+    const lastSensorDataIssues = await Cache.model.get({
+      FactoryId: factoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+    })
+
+    issues = issues.map((issue) => ({
+      ...issue,
+      Acknowledge: false,
+    }))
+
+    let lastIssuesInDB: SensorDataIssue[] = []
+
+    if (lastSensorDataIssues) {
+      try {
+        lastIssuesInDB = JSON.parse(lastSensorDataIssues.Data)
+        if (!Array.isArray(lastIssuesInDB)) {
+          lastIssuesInDB = []
+        }
+        lastIssuesInDB.push(...issues)
+        // Keep only the last 10 issues
+        lastIssuesInDB = lastIssuesInDB.slice(-10)
+        await Cache.model.update({
+          FactoryId: factoryId,
+          CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+          Data: JSON.stringify(lastIssuesInDB),
+        })
+        return true
+      } catch (error) {
+        console.log('Failed in getting last sensor data issues')
+      }
+    }
+
+    lastIssuesInDB = issues
+
+    // If there is no last sensor data issues, create a new one
+    await Cache.model.create({
+      FactoryId: factoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+      Data: JSON.stringify(lastIssuesInDB),
+    })
+    return true
   }
 }

@@ -1,13 +1,13 @@
-import { protos, TextToSpeechClient } from '@google-cloud/text-to-speech'
+import { GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { TextToSpeechClient, protos } from '@google-cloud/text-to-speech'
 import { APIGatewayEvent, Context } from 'aws-lambda'
-import { S3 } from 'aws-sdk'
 import { HttpStatusCode } from 'axios'
 import objectHash from 'object-hash'
 import { middyfy } from '~core/lambda/lambda'
 import { base64decode } from '~shared/utils'
 import { GenerateTextToSpeech } from './types'
 
-const s3 = new S3()
+const s3Client = new S3Client({})
 
 async function handler(event: APIGatewayEvent, context: Context) {
   const params = event.queryStringParameters ?? ({} as GenerateTextToSpeech)
@@ -31,12 +31,23 @@ async function handler(event: APIGatewayEvent, context: Context) {
   }
 
   const audioHash = `PollyOutputs/${objectHash(synthesizeSpeechRequest)}`
-  const s3AudioParams: S3.Types.HeadObjectRequest = { Bucket: process.env.S3_PRIVATE_BUCKET_NAME, Key: audioHash }
 
   try {
-    const headObjectResponse = await s3.headObject(s3AudioParams).promise()
+    const headObjectResponse = await s3Client.send(
+      new HeadObjectCommand({
+        Bucket: process.env.S3_PRIVATE_BUCKET_NAME,
+        Key: audioHash,
+      }),
+    )
+
     if (headObjectResponse.ETag) {
-      const getObjectResponse = await s3.getObject(s3AudioParams).promise()
+      const getObjectResponse = await s3Client.send(
+        new GetObjectCommand({
+          Bucket: process.env.S3_PRIVATE_BUCKET_NAME,
+          Key: audioHash,
+        }),
+      )
+
       const audioBuffer = Buffer.from(getObjectResponse.Body as any)
       const audioBase64 = audioBuffer.toString('base64')
       return {
@@ -59,7 +70,13 @@ async function handler(event: APIGatewayEvent, context: Context) {
   const audioBuffer = Buffer.from(response.audioContent)
   const audioBase64 = audioBuffer.toString('base64')
 
-  await s3.upload({ ...s3AudioParams, Body: audioBuffer }).promise()
+  await s3Client.send(
+    new PutObjectCommand({
+      Bucket: process.env.S3_PRIVATE_BUCKET_NAME,
+      Key: audioHash,
+      Body: audioBuffer,
+    }),
+  )
 
   return {
     statusCode: HttpStatusCode.Ok,
