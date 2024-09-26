@@ -49,8 +49,7 @@ async function handler(event: APIGatewayEvent, context: Context) {
           Key: audioHash,
         }),
       )
-
-      const audioBuffer = Buffer.from(getObjectResponse.Body as any)
+      const audioBuffer = getObjectResponse.Body as any as Buffer
       const audioBase64 = audioBuffer.toString('base64')
 
       console.log('Audio from S3')
@@ -65,7 +64,9 @@ async function handler(event: APIGatewayEvent, context: Context) {
         body: audioBase64,
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log('Error in getting audio from S3', error)
+  }
 
   // Audio not exist in S3
   const credentials = JSON.parse(base64decode(process.env.GCP_CREDENTIALS_BASE64) ?? '{}')
