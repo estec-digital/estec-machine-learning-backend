@@ -24,8 +24,6 @@ async function handler(event: APIGatewayEvent, context: Context) {
     }
   }
 
-  console.log({ text: params.text })
-
   const synthesizeSpeechRequest: protos.google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
     input: { text: params.text },
     voice: { languageCode: 'vi-VN', name: 'vi-VN-Wavenet-A', ssmlGender: 'NEUTRAL' },
@@ -33,6 +31,8 @@ async function handler(event: APIGatewayEvent, context: Context) {
   }
 
   const audioHash = `PollyOutputs/${objectHash(synthesizeSpeechRequest)}`
+
+  console.log({ text: params.text, hash: audioHash })
 
   try {
     const headObjectResponse = await s3Client.send(
@@ -52,6 +52,9 @@ async function handler(event: APIGatewayEvent, context: Context) {
 
       const audioBuffer = Buffer.from(getObjectResponse.Body as any)
       const audioBase64 = audioBuffer.toString('base64')
+
+      console.log('Audio from S3')
+
       return {
         statusCode: HttpStatusCode.Ok,
         headers: {
@@ -79,6 +82,8 @@ async function handler(event: APIGatewayEvent, context: Context) {
       Body: audioBuffer,
     }),
   )
+
+  console.log('Audio from GCP')
 
   return {
     statusCode: HttpStatusCode.Ok,
