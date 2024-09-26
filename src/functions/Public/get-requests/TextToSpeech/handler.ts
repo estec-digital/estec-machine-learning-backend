@@ -24,6 +24,8 @@ async function handler(event: APIGatewayEvent, context: Context) {
     }
   }
 
+  console.log({ text: params.text })
+
   const synthesizeSpeechRequest: protos.google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
     input: { text: params.text },
     voice: { languageCode: 'vi-VN', name: 'vi-VN-Wavenet-A', ssmlGender: 'NEUTRAL' },
