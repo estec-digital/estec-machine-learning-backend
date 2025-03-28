@@ -151,7 +151,8 @@ export class DynamoDBStreamService {
       rawSensorData.note.triggedFnProcessDataToAppDB = true
       await rawSensorData.save()
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
-
+      const timeParts = newRawSensorDataItem.Time.split(":");
+      const minutes = parseInt(timeParts[1]);
       const sensorData: Partial<ISensorData> = {
         FactoryId_Date: newRawSensorDataItem.FactoryId_Date,
         Date: newRawSensorDataItem.Date,
@@ -162,10 +163,10 @@ export class DynamoDBStreamService {
           GA02_Oxi: newRawSensorDataItem['4G1GA02XAC01_O2_AVG'],
           GA03_Oxi: newRawSensorDataItem['4G1GA03XAC01_O2_AVG'],
           // GA04_Oxi: newRawSensorDataItem['4G1GA04XAC01_O2_AVG'],
-          KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
-          KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
+          // KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
+          // KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
           Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
-          Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
+          // Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
           MaterialTowerHeat: newRawSensorDataItem['_G1PJ01MCH02T8201_TIA_IO_Signal_Value'],
           TowerOilTemp: newRawSensorDataItem['4G1PS01GPJ02_T8201_AVG'],
           RecHeadTemp: newRawSensorDataItem['4R1GQ01JNT01_T8201_AVG'],
@@ -200,6 +201,11 @@ export class DynamoDBStreamService {
           S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
           Conveyor_Flow: newRawSensorDataItem['4C1BE01DRV01_M2001_I'],
         },
+      }
+      if (minutes % 5 === 0) {
+        sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'];
+        sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'];
+        sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'];
       }
 
       const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
