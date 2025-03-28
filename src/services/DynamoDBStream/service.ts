@@ -207,6 +207,7 @@ export class DynamoDBStreamService {
         sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'];
         sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'];
       }
+      
 
       const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
       if (!sensorDataItem) {
