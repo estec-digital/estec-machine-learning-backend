@@ -163,10 +163,10 @@ export class DynamoDBStreamService {
           GA02_Oxi: newRawSensorDataItem['4G1GA02XAC01_O2_AVG'],
           GA03_Oxi: newRawSensorDataItem['4G1GA03XAC01_O2_AVG'],
           // GA04_Oxi: newRawSensorDataItem['4G1GA04XAC01_O2_AVG'],
-          // KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
-          // KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
+          KilnDriAmp: newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'],
+          KilnInletTemp: newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'],
           Nox: newRawSensorDataItem['4G1GA01XAC01_NO_AVG'],
-          // Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
+          Pyrometer: newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'],
           MaterialTowerHeat: newRawSensorDataItem['_G1PJ01MCH02T8201_TIA_IO_Signal_Value'],
           TowerOilTemp: newRawSensorDataItem['4G1PS01GPJ02_T8201_AVG'],
           RecHeadTemp: newRawSensorDataItem['4R1GQ01JNT01_T8201_AVG'],
@@ -203,27 +203,9 @@ export class DynamoDBStreamService {
         },
       }
       if (minutes % 5 === 0) {
-        // Nếu là phút thứ 5, lưu giá trị gốc
         sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'];
         sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'];
         sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'];
-      } else {
-        // Nếu không phải phút thứ 5, tìm giá trị gần nhất của phút thứ 5 trước đó
-        const previousFiveMinuteData = await SensorData.model
-          .query("FactoryId_Date")
-          .eq(newRawSensorDataItem.FactoryId_Date)
-          .where("Time")
-          .lt(newRawSensorDataItem.Time)
-          .sort("descending")
-          .limit(1)
-          .exec();
-      
-        if (previousFiveMinuteData && previousFiveMinuteData.length > 0) {
-          const lastFiveMinRecord = previousFiveMinuteData[0].SensorData;
-          sensorData.SensorData!.Pyrometer = lastFiveMinRecord.Pyrometer;
-          sensorData.SensorData!.KilnDriAmp = lastFiveMinRecord.KilnDriAmp;
-          sensorData.SensorData!.KilnInletTemp = lastFiveMinRecord.KilnInletTemp;
-        }
       }
 
       const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
