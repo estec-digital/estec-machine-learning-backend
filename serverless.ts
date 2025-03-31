@@ -1,4 +1,4 @@
-import type { AWS, AwsLogRetentionInDays } from '@serverless/typescript'
+import type { AWS } from '@serverless/typescript'
 import * as dotenv from 'dotenv'
 import { apiGatewayResources } from '~aws_resources/api-gateway'
 
@@ -81,7 +81,7 @@ const serverlessConfiguration: AWS = {
         ],
       },
     },
-    logRetentionInDays: Number('${custom.logRetentionInDays.${custom.stage}}' ?? '7') as unknown as AwsLogRetentionInDays,
+    // logRetentionInDays: Number('${custom.logRetentionInDays.${custom.stage}}' ?? '7') as unknown as AwsLogRetentionInDays,
   },
 
   // AWS Lambda functions declaration
