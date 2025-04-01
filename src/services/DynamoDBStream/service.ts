@@ -65,6 +65,7 @@ export class DynamoDBStreamService {
         }
 
         try {
+          // console.log('/find_issues', fifteenMinutesAgoSensorData)
           response2 = await axios
             .post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
               headers: {
