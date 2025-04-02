@@ -8,12 +8,14 @@ export const main: DynamoDBStreamHandler = async (event, context) => {
       // Process each record in the DynamoDB stream
       switch (record.eventSourceARN) {
         case process.env['DYNAMODB_ARN__WebSocketConnection']: {
+          console.log('Processing handleConnectionInsertionStream')
           if (record.eventName === 'INSERT') {
             await DynamoDBStreamService.handleConnectionInsertionStream(record)
           }
           break
         }
         case process.env['DYNAMODB_ARN__RawSensorData']: {
+          console.log('Processing handleRawSensorDataStream')
           if (record.eventName === 'INSERT' || record.eventName === 'MODIFY') {
             await DynamoDBStreamService.handleRawSensorDataStream(record)
           }
@@ -21,6 +23,7 @@ export const main: DynamoDBStreamHandler = async (event, context) => {
           break
         }
         case process.env['DYNAMODB_ARN__SensorData']: {
+          console.log('Processing handleSensorDataStream')
           if (record.eventName === 'INSERT' || record.eventName === 'MODIFY') {
             await DynamoDBStreamService.handleSensorDataStream(record)
           }
