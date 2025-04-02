@@ -38,7 +38,7 @@ const serverlessConfiguration: AWS = {
     stage: process.env.STAGE ?? '${opt:stage, "alpha"}',
 
     // AWS Lambda configs
-    runtime: 'nodejs20.x',
+    runtime: 'nodejs16.x',
     timeout: 15,
     memorySize: 2048,
 

@@ -34,9 +34,10 @@ export class DynamoDBStreamService {
       try {
         const nowDate = dayjs(`${item.Date} ${item.Time}`, 'YYYY-MM-DD HH:mm:ss')
         const fifteenMinutesAgo: dayjs.Dayjs[] = []
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i < 60; i+=5) {
           fifteenMinutesAgo.push(nowDate.subtract(i, 'minute'))
         }
+        console.log("Five minutes ago values:", fifteenMinutesAgo.map(dt => dt.format('YYYY-MM-DD HH:mm:ss')));
         const fifteenMinutesAgoDataResponse = await SensorData.model.batchGet(
           fifteenMinutesAgo.map((dateTime) => ({
             FactoryId_Date: `${item.FactoryId}::${dateTime.format('YYYY-MM-DD')}`,
@@ -144,7 +145,7 @@ export class DynamoDBStreamService {
 
   public static async handleRawSensorDataStream(record: IDynamoDBRecord<IRawSensorData>) {
     const newRawSensorDataItem = unmarshall(record.dynamodb.NewImage as any) as IRawSensorData
-
+    
     const rawSensorData = await RawSensorData.model.get({ FactoryId_Date: newRawSensorDataItem.FactoryId_Date, Time: newRawSensorDataItem.Time })
     if (!rawSensorData) return
     if (rawSensorData.note?.triggedFnProcessDataToAppDB === false) {
