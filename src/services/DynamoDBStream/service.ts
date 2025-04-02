@@ -152,8 +152,8 @@ export class DynamoDBStreamService {
       rawSensorData.note.triggedFnProcessDataToAppDB = true
       await rawSensorData.save()
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
-      const timeParts = newRawSensorDataItem.Time.split(":");
-      const minutes = parseInt(timeParts[1]);
+      const timeParts = newRawSensorDataItem.Time.split(':')
+      const minutes = parseInt(timeParts[1])
       const sensorData: Partial<ISensorData> = {
         FactoryId_Date: newRawSensorDataItem.FactoryId_Date,
         Date: newRawSensorDataItem.Date,
@@ -201,12 +201,27 @@ export class DynamoDBStreamService {
           CaO_f: newRawSensorDataItem['BP_KSCL_CL_CaOf'],
           S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
           Conveyor_Flow: newRawSensorDataItem['4C1BE01DRV01_M2001_I'],
+
+          x4C1CD01XCC01_Binfilling: newRawSensorDataItem['4C1CD01XCC01_Binfilling'],
+          x4G1PS02PGP01_T8201: newRawSensorDataItem['4G1PS02PGP01_T8201'],
+          x4G1PS01GPJ01_T8201I: newRawSensorDataItem['4G1PS01GPJ01_T8201I'],
+          x4G1GA01XAC01_CO: newRawSensorDataItem['4G1GA01XAC01_CO'],
+          x4G1GA02XAC01_A0901: newRawSensorDataItem['4G1GA02XAC01_A0901'],
+          x4G1GA03XAC01_A0901: newRawSensorDataItem['4G1GA03XAC01_A0901'],
+          x4G1GA04XAC01_A0901: newRawSensorDataItem['4G1GA04XAC01_A0901'],
+          x4G1FN01MMS01_T9601: newRawSensorDataItem['4G1FN01MMS01_T9601'],
+          x4G1KJ01JST00_B5001: newRawSensorDataItem['4G1KJ01JST00_B5001'],
+          x4R1RR01EXD01_T8102: newRawSensorDataItem['4R1RR01EXD01_T8102'],
+          x4S1GP02JST00_T8201: newRawSensorDataItem['4S1GP02JST00_T8201'],
+          x4T1AY01JST00_B8702: newRawSensorDataItem['4T1AY01JST00_B8702'],
+          x4R1FN01TVJ01_B5101_INFSC: newRawSensorDataItem['4R1FN01TVJ01_B5101_INFSC'],
+          x4R1GQ01HYS01_T8101: newRawSensorDataItem['4R1GQ01HYS01_T8101'],
         },
       }
       if (minutes % 5 === 0) {
-        sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'];
-        sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'];
-        sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'];
+        sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG']
+        sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG']
+        sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG']
       }
 
       const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
