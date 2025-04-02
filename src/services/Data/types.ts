@@ -31,10 +31,13 @@ export interface IIssueUpdateAcknowledgeResponse {
 }
 
 export interface IAppDBQueryData {
-  Date: string
-  Time?: string
-  sort?: SortOrder
-  limit?: number
+  StartDate: string;           // Ví dụ: "2025-03-26"
+  EndDate: string;             // Ví dụ: "2025-03-27"
+  Time?: {
+    between: [string, string]; // Ví dụ: ["14:00:00", "18:00:00"] nếu cần lọc theo giờ trong ngày
+  };
+  sort?: 'ascending' | 'descending';
+  limit?: number;
 }
 
 export type IUpdateThreshold = IFactory['ThresholdData']

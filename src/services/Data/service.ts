@@ -55,21 +55,41 @@ export class DataService {
   }
 
   public static async appDBQueryData(params: IActionHandlerParams<Types.IAppDBQueryData>): Promise<QueryResponse<ISensorData>> {
-    const queryParams = {
-      FactoryId_Date: getPartitionKey_SensorData({ FactoryId: params.authData.FactoryId, Date: params.bodyPayload.Date }),
+    // Tạo partition key dựa trên StartDate (vì dữ liệu phân vùng theo FactoryId_Date)
+    const queryParams: any = {
+      FactoryId_Date: getPartitionKey_SensorData({
+        FactoryId: params.authData.FactoryId,
+        Date: params.bodyPayload.StartDate
+      }),
+    };
+  
+    // Thêm điều kiện lọc theo khoảng ngày nếu có EndDate
+    if (params.bodyPayload.EndDate) {
+      // Giả sử bạn muốn truy vấn dữ liệu từ StartDate đến EndDate
+      queryParams['DateRange'] = {
+        between: [params.bodyPayload.StartDate, params.bodyPayload.EndDate]
+      };
     }
+  
+    // Nếu có thông tin Time, thêm vào điều kiện lọc theo giờ trong ngày
     if (params.bodyPayload.Time) {
-      queryParams['Time'] = params.bodyPayload.Time
+      queryParams['Time'] = params.bodyPayload.Time;
     }
-    let query = SensorData.model.query(queryParams)
+  
+    // Xây dựng truy vấn từ model
+    let query = SensorData.model.query(queryParams);
+  
+    // Áp dụng sắp xếp nếu có
     if (params.bodyPayload.sort) {
-      query = query.sort(params.bodyPayload.sort)
+      query = query.sort(params.bodyPayload.sort);
     }
+    // Áp dụng giới hạn số lượng nếu có
     if (params.bodyPayload.limit) {
-      query = query.limit(params.bodyPayload.limit)
+      query = query.limit(params.bodyPayload.limit);
     }
-    const data = await query.exec()
-    return data
+    
+    const data = await query.exec();
+    return data;
   }
 
   public static async appDBQueryLastItemsOfSensorData(params: { numberOfItems: number; factoryId: string }): Promise<Partial<ISensorData>[]> {
