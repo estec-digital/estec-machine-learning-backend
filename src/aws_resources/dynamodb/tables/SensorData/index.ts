@@ -51,20 +51,20 @@ export interface ISensorData {
 
     Conveyor_Flow?: number
 
-    x4C1CD01XCC01_Binfilling?: number
-    x4G1PS02PGP01_T8201?: number
-    x4G1PS01GPJ01_T8201I?: number
-    x4G1GA01XAC01_CO?: number
-    x4G1GA02XAC01_A0901?: number
-    x4G1GA03XAC01_A0901?: number
-    x4G1GA04XAC01_A0901?: number
-    x4G1FN01MMS01_T9601?: number
-    x4G1KJ01JST00_B5001?: number
-    x4R1RR01EXD01_T8102?: number
-    x4S1GP02JST00_T8201?: number
-    x4T1AY01JST00_B8702?: number
-    x4R1FN01TVJ01_B5101_INFSC?: number
-    x4R1GQ01HYS01_T8101?: number
+    '4C1CD01XCC01_Binfilling'?: number
+    '4G1PS02PGP01_T8201'?: number
+    '4G1PS01GPJ01_T8201I'?: number
+    '4G1GA01XAC01_CO'?: number
+    '4G1GA02XAC01_A0901'?: number
+    '4G1GA03XAC01_A0901'?: number
+    '4G1GA04XAC01_A0901'?: number
+    '4G1FN01MMS01_T9601'?: number
+    '4G1KJ01JST00_B5001'?: number
+    '4R1RR01EXD01_T8102'?: number
+    '4S1GP02JST00_T8201'?: number
+    '4T1AY01JST00_B8702'?: number
+    '4R1FN01TVJ01_B5101_INFSC'?: number
+    '4R1GQ01HYS01_T8101'?: number
   }
   Prediction: null | {
     GeneralStatus?: string
