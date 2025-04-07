@@ -65,6 +65,7 @@ export class DynamoDBStreamService {
         }
 
         try {
+          // console.log('/find_issues', fifteenMinutesAgoSensorData)
           response2 = await axios
             .post(`${process.env.AI_BASE_URL}/find_issues`, fifteenMinutesAgoSensorData, {
               headers: {
@@ -151,7 +152,8 @@ export class DynamoDBStreamService {
       rawSensorData.note.triggedFnProcessDataToAppDB = true
       await rawSensorData.save()
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
-
+      const timeParts = newRawSensorDataItem.Time.split(":");
+      const minutes = parseInt(timeParts[1]);
       const sensorData: Partial<ISensorData> = {
         FactoryId_Date: newRawSensorDataItem.FactoryId_Date,
         Date: newRawSensorDataItem.Date,
@@ -200,6 +202,11 @@ export class DynamoDBStreamService {
           S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
           Conveyor_Flow: newRawSensorDataItem['4C1BE01DRV01_M2001_I'],
         },
+      }
+      if (minutes % 5 === 0) {
+        sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'];
+        sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'];
+        sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'];
       }
 
       const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })

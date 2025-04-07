@@ -8,7 +8,7 @@ env:
   STAGE: 'alpha'
   PROVIDER_NAME: 'aws'
   REGION: 'ap-southeast-1'
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '18.x'
   TZ: 'Asia/Ho_Chi_Minh'
 
 jobs:
