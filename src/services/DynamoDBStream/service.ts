@@ -3,6 +3,7 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import { Cache, IRawSensorData, ISensorData, RawSensorData, SensorData } from '~aws_resources/dynamodb/tables/'
 import { CACHE_SORT_KEY } from '~aws_resources/dynamodb/tables/Cache/types'
+import { Warning } from '~aws_resources/dynamodb/tables/SensorData/types'
 import { EWebSocketConnectionIndexes, IWebSocketConnection, WebSocketConnection } from '~aws_resources/dynamodb/tables/WebSocketConnection'
 import { executeConcurrently } from '~core/dynamoose/model'
 import { IDynamoDBRecord } from '~core/dynamoose/types'
@@ -50,7 +51,10 @@ export class DynamoDBStreamService {
         }
 
         let response1
-        let response2: SensorDataIssue[]
+        let response2: {
+          issues: SensorDataIssue[]
+          warnings: Warning[]
+        }
 
         try {
           response1 = await axios
@@ -88,9 +92,10 @@ export class DynamoDBStreamService {
           }
           item.Trending = response1.future_trend?.data ?? null
           item.PastTrendData = response1.past_trend?.data ?? null
-
-          if (Array.isArray(response2) && response2.length > 0) {
-            response2 = response2.map((issue) => ({
+        }
+        if (response2) {
+          if (Array.isArray(response2.issues) && response2.issues.length > 0) {
+            const issues = response2.issues.map((issue) => ({
               ...issue,
               SensorDataInfo: {
                 FactoryId: item.FactoryId,
@@ -99,8 +104,13 @@ export class DynamoDBStreamService {
               },
             }))
 
-            item.Issues = response2
-            await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, response2 ?? [])
+            item.Issues = issues
+            await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, issues ?? [])
+          }
+
+          if (Array.isArray(response2.warnings) && response2.warnings) {
+            item.Warnings = response2.warnings
+            await DynamoDBStreamService.updateLastSensorDataWarnings(item.FactoryId, response2.warnings ?? [])
           }
         }
       } catch (error) {
@@ -279,6 +289,49 @@ export class DynamoDBStreamService {
       FactoryId: factoryId,
       CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
       Data: JSON.stringify(lastIssuesInDB),
+    })
+    return true
+  }
+
+  private static async updateLastSensorDataWarnings(factoryId: string, warnings: Warning[]) {
+    if (!(Array.isArray(warnings) && warnings.length > 0)) {
+      return false
+    }
+
+    const lastSensorDataWarnings = await Cache.model.get({
+      FactoryId: factoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+    })
+
+    let lastWarningsInDB: Warning[] = []
+
+    if (lastSensorDataWarnings) {
+      try {
+        lastWarningsInDB = JSON.parse(lastSensorDataWarnings.Data)
+        if (!Array.isArray(lastWarningsInDB)) {
+          lastWarningsInDB = []
+        }
+        lastWarningsInDB.push(...warnings)
+        // Keep only the last 10 issues
+        lastWarningsInDB = lastWarningsInDB.slice(-10)
+        await Cache.model.update({
+          FactoryId: factoryId,
+          CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_WARNINGS,
+          Data: JSON.stringify(lastWarningsInDB),
+        })
+        return true
+      } catch (error) {
+        console.log('Failed in getting last sensor data issues')
+      }
+    }
+
+    lastWarningsInDB = warnings
+
+    // If there is no last sensor data issues, create a new one
+    await Cache.model.create({
+      FactoryId: factoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_WARNINGS,
+      Data: JSON.stringify(lastWarningsInDB),
     })
     return true
   }

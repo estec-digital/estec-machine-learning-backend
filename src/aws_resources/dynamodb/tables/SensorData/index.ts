@@ -1,6 +1,7 @@
 import { constraintChecking__SensorData } from '~aws_resources/dynamodb/middlewares'
 import { DynamoDBTable } from '~core/dynamodb'
 import { SchemaDefinition, SchemaSettings } from '~core/dynamodb/types'
+import { Warning } from './types'
 export interface ISensorData {
   FactoryId_Date: string // Partition key: F_aBc1D::2023-07-30
   Time: string // Sort key: 19:35:18
@@ -91,6 +92,7 @@ export interface ISensorData {
       Time: ISensorData['Time']
     }
   }[]
+  Warnings: Warning[]
 }
 
 export enum ESensorDataIndexes {}
@@ -123,7 +125,19 @@ const schemaDefinition: SchemaDefinition = {
 }
 
 const schemaSettings: SchemaSettings = {
-  saveUnknown: ['SensorData.*', 'Prediction.*', 'Prediction.**', 'Trending.*', 'Trending.**', 'PastTrendData.*', 'PastTrendData.**', 'Issues.*', 'Issues.**'],
+  saveUnknown: [
+    'SensorData.*',
+    'Prediction.*',
+    'Prediction.**',
+    'Trending.*',
+    'Trending.**',
+    'PastTrendData.*',
+    'PastTrendData.**',
+    'Issues.*',
+    'Issues.**',
+    'Warnings.*',
+    'Warnings.**',
+  ],
   timestamps: {
     updatedAt: ['UpdatedAt'],
   },
