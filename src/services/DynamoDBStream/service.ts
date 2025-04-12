@@ -3,6 +3,7 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import { Cache, IRawSensorData, ISensorData, RawSensorData, SensorData } from '~aws_resources/dynamodb/tables/'
 import { CACHE_SORT_KEY } from '~aws_resources/dynamodb/tables/Cache/types'
+import { Warning } from '~aws_resources/dynamodb/tables/SensorData/types'
 import { EWebSocketConnectionIndexes, IWebSocketConnection, WebSocketConnection } from '~aws_resources/dynamodb/tables/WebSocketConnection'
 import { executeConcurrently } from '~core/dynamoose/model'
 import { IDynamoDBRecord } from '~core/dynamoose/types'
@@ -50,7 +51,10 @@ export class DynamoDBStreamService {
         }
 
         let response1
-        let response2: SensorDataIssue[]
+        let response2: {
+          issues: SensorDataIssue[]
+          warnings: Warning[]
+        }
 
         try {
           response1 = await axios
@@ -88,9 +92,10 @@ export class DynamoDBStreamService {
           }
           item.Trending = response1.future_trend?.data ?? null
           item.PastTrendData = response1.past_trend?.data ?? null
-
-          if (Array.isArray(response2) && response2.length > 0) {
-            response2 = response2.map((issue) => ({
+        }
+        if (response2) {
+          if (Array.isArray(response2.issues) && response2.issues.length > 0) {
+            const issues = response2.issues.map((issue) => ({
               ...issue,
               SensorDataInfo: {
                 FactoryId: item.FactoryId,
@@ -99,8 +104,13 @@ export class DynamoDBStreamService {
               },
             }))
 
-            item.Issues = response2
-            await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, response2 ?? [])
+            item.Issues = issues
+            await DynamoDBStreamService.updateLastSensorDataIssues(item.FactoryId, issues ?? [])
+          }
+
+          if (Array.isArray(response2.warnings) && response2.warnings) {
+            item.Warnings = response2.warnings
+            await DynamoDBStreamService.updateLastSensorDataWarnings(item.FactoryId, response2.warnings ?? [])
           }
         }
       } catch (error) {
@@ -152,8 +162,8 @@ export class DynamoDBStreamService {
       rawSensorData.note.triggedFnProcessDataToAppDB = true
       await rawSensorData.save()
       // console.log(`[RawDB] Item(${item.Date} ${item.Time}) process data to save to [AppDB]...`)
-      const timeParts = newRawSensorDataItem.Time.split(":");
-      const minutes = parseInt(timeParts[1]);
+      const timeParts = newRawSensorDataItem.Time.split(':')
+      const minutes = parseInt(timeParts[1])
       const sensorData: Partial<ISensorData> = {
         FactoryId_Date: newRawSensorDataItem.FactoryId_Date,
         Date: newRawSensorDataItem.Date,
@@ -201,12 +211,27 @@ export class DynamoDBStreamService {
           CaO_f: newRawSensorDataItem['BP_KSCL_CL_CaOf'],
           S03_hot_meal: newRawSensorDataItem['BP_KSCL_CL_SO3'],
           Conveyor_Flow: newRawSensorDataItem['4C1BE01DRV01_M2001_I'],
+
+          '4C1CD01XCC01_Binfilling': newRawSensorDataItem['4C1CD01XCC01_Binfilling'],
+          '4G1PS02PGP01_T8201': newRawSensorDataItem['4G1PS02PGP01_T8201'],
+          '4G1PS01GPJ01_T8201I': newRawSensorDataItem['4G1PS01GPJ01_T8201I'],
+          '4G1GA01XAC01_CO': newRawSensorDataItem['4G1GA01XAC01_CO'],
+          '4G1GA02XAC01_A0901': newRawSensorDataItem['4G1GA02XAC01_A0901'],
+          '4G1GA03XAC01_A0901': newRawSensorDataItem['4G1GA03XAC01_A0901'],
+          '4G1GA04XAC01_A0901': newRawSensorDataItem['4G1GA04XAC01_A0901'],
+          '4G1FN01MMS01_T9601': newRawSensorDataItem['4G1FN01MMS01_T9601'],
+          '4G1KJ01JST00_B5001': newRawSensorDataItem['4G1KJ01JST00_B5001'],
+          '4R1RR01EXD01_T8102': newRawSensorDataItem['4R1RR01EXD01_T8102'],
+          '4S1GP02JST00_T8201': newRawSensorDataItem['4S1GP02JST00_T8201'],
+          '4T1AY01JST00_B8702': newRawSensorDataItem['4T1AY01JST00_B8702'],
+          '4R1FN01TVJ01_B5101_INFSC': newRawSensorDataItem['4R1FN01TVJ01_B5101_INFSC'],
+          '4R1GQ01HYS01_T8101': newRawSensorDataItem['4R1GQ01HYS01_T8101'],
         },
       }
       if (minutes % 5 === 0) {
-        sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG'];
-        sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG'];
-        sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG'];
+        sensorData.SensorData!.Pyrometer = newRawSensorDataItem['4K1KP01KHE01_B8701_AVG']
+        sensorData.SensorData!.KilnDriAmp = newRawSensorDataItem['4K1KP01DRV01_M2001_EI_AVG']
+        sensorData.SensorData!.KilnInletTemp = newRawSensorDataItem['4G1KJ01JST00_T8401_AVG']
       }
 
       const sensorDataItem = await SensorData.model.get({ FactoryId_Date: sensorData.FactoryId_Date, Time: sensorData.Time })
@@ -264,6 +289,49 @@ export class DynamoDBStreamService {
       FactoryId: factoryId,
       CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
       Data: JSON.stringify(lastIssuesInDB),
+    })
+    return true
+  }
+
+  private static async updateLastSensorDataWarnings(factoryId: string, warnings: Warning[]) {
+    if (!(Array.isArray(warnings) && warnings.length > 0)) {
+      return false
+    }
+
+    const lastSensorDataWarnings = await Cache.model.get({
+      FactoryId: factoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_ISSUES,
+    })
+
+    let lastWarningsInDB: Warning[] = []
+
+    if (lastSensorDataWarnings) {
+      try {
+        lastWarningsInDB = JSON.parse(lastSensorDataWarnings.Data)
+        if (!Array.isArray(lastWarningsInDB)) {
+          lastWarningsInDB = []
+        }
+        lastWarningsInDB.push(...warnings)
+        // Keep only the last 10 issues
+        lastWarningsInDB = lastWarningsInDB.slice(-10)
+        await Cache.model.update({
+          FactoryId: factoryId,
+          CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_WARNINGS,
+          Data: JSON.stringify(lastWarningsInDB),
+        })
+        return true
+      } catch (error) {
+        console.log('Failed in getting last sensor data issues')
+      }
+    }
+
+    lastWarningsInDB = warnings
+
+    // If there is no last sensor data issues, create a new one
+    await Cache.model.create({
+      FactoryId: factoryId,
+      CacheKey: CACHE_SORT_KEY.LAST_SENSOR_DATA_WARNINGS,
+      Data: JSON.stringify(lastWarningsInDB),
     })
     return true
   }
