@@ -241,6 +241,11 @@ export class DynamoDBStreamService {
           '4R1FC02TVJ01B5101_INFS': newRawSensorDataItem['4R1FC02TVJ01B5101_INFS'],
           '4R1FC06TVJ01B5101_INFS': newRawSensorDataItem['4R1FC06TVJ01B5101_INFS'],
           '4E1GP01JST00_T8202': newRawSensorDataItem['4E1GP01JST00_T8202'],
+
+          '4G1GA03XAC01_O2_1min': newRawSensorDataItem['4G1GA03XAC01_O2_1min'],
+          '4G1GA02XAC01_O2_1min': newRawSensorDataItem['4G1GA02XAC01_O2_1min'],
+          '4G1GA01XAC01_O2_1min': newRawSensorDataItem['4G1GA01XAC01_O2_1min'],
+          '4G1GA01XAC01_NO_1min': newRawSensorDataItem['4G1GA01XAC01_NO_1min'],
         },
       }
       if (minutes % 5 === 0) {

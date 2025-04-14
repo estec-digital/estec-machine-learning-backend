@@ -81,6 +81,11 @@ export interface ISensorData {
     '4R1FC02TVJ01B5101_INFS': number
     '4R1FC06TVJ01B5101_INFS': number
     '4E1GP01JST00_T8202': number
+
+    '4G1GA03XAC01_O2_1min': number
+    '4G1GA02XAC01_O2_1min': number
+    '4G1GA01XAC01_O2_1min': number
+    '4G1GA01XAC01_NO_1min': number
   }
   Prediction: null | {
     GeneralStatus?: string
