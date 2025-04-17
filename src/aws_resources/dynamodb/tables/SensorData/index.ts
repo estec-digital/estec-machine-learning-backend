@@ -66,6 +66,26 @@ export interface ISensorData {
     '4T1AY01JST00_B8702'?: number
     '4R1FN01TVJ01_B5101_INFSC'?: number
     '4R1GQ01HYS01_T8101'?: number
+
+    '4C1BF01FNJ01_M2001_I': number
+    Grate_Hyd_Pressure: number
+    '4G1GA04XAC01_O2': number
+    '4K1KP01RST01_T8101': number
+    '4K1KP01RST01_T8102': number
+    '4K1KP01RST01_T8103': number
+    '4K1KP01RST01_T8104': number
+    '4K1KP01RST02_T8101': number
+    '4K1KP01RST02_T8102': number
+    '4K1KP01RST02_T8103': number
+    '4K1KP01RST02_T8104': number
+    '4R1FC02TVJ01B5101_INFS': number
+    '4R1FC06TVJ01B5101_INFS': number
+    '4E1GP01JST00_T8202': number
+
+    '4G1GA03XAC01_O2_1min': number
+    '4G1GA02XAC01_O2_1min': number
+    '4G1GA01XAC01_O2_1min': number
+    '4G1GA01XAC01_NO_1min': number
   }
   Prediction: null | {
     GeneralStatus?: string

@@ -226,6 +226,26 @@ export class DynamoDBStreamService {
           '4T1AY01JST00_B8702': newRawSensorDataItem['4T1AY01JST00_B8702'],
           '4R1FN01TVJ01_B5101_INFSC': newRawSensorDataItem['4R1FN01TVJ01_B5101_INFSC'],
           '4R1GQ01HYS01_T8101': newRawSensorDataItem['4R1GQ01HYS01_T8101'],
+
+          '4C1BF01FNJ01_M2001_I': newRawSensorDataItem['4C1BF01FNJ01_M2001_I'],
+          Grate_Hyd_Pressure: newRawSensorDataItem['Grate_Hyd_Pressure'],
+          '4G1GA04XAC01_O2': newRawSensorDataItem['4G1GA04XAC01_O2'],
+          '4K1KP01RST01_T8101': newRawSensorDataItem['4K1KP01RST01_T8101'],
+          '4K1KP01RST01_T8102': newRawSensorDataItem['4K1KP01RST01_T8102'],
+          '4K1KP01RST01_T8103': newRawSensorDataItem['4K1KP01RST01_T8103'],
+          '4K1KP01RST01_T8104': newRawSensorDataItem['4K1KP01RST01_T8104'],
+          '4K1KP01RST02_T8101': newRawSensorDataItem['4K1KP01RST02_T8101'],
+          '4K1KP01RST02_T8102': newRawSensorDataItem['4K1KP01RST02_T8102'],
+          '4K1KP01RST02_T8103': newRawSensorDataItem['4K1KP01RST02_T8103'],
+          '4K1KP01RST02_T8104': newRawSensorDataItem['4K1KP01RST02_T8104'],
+          '4R1FC02TVJ01B5101_INFS': newRawSensorDataItem['4R1FC02TVJ01B5101_INFS'],
+          '4R1FC06TVJ01B5101_INFS': newRawSensorDataItem['4R1FC06TVJ01B5101_INFS'],
+          '4E1GP01JST00_T8202': newRawSensorDataItem['4E1GP01JST00_T8202'],
+
+          '4G1GA03XAC01_O2_1min': newRawSensorDataItem['4G1GA03XAC01_O2_1min'],
+          '4G1GA02XAC01_O2_1min': newRawSensorDataItem['4G1GA02XAC01_O2_1min'],
+          '4G1GA01XAC01_O2_1min': newRawSensorDataItem['4G1GA01XAC01_O2_1min'],
+          '4G1GA01XAC01_NO_1min': newRawSensorDataItem['4G1GA01XAC01_NO_1min'],
         },
       }
       if (minutes % 5 === 0) {
